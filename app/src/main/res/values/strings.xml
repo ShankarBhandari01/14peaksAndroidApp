@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">14PeaksRestro</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="login_fragment_label">Login Fragment</string>
+    <string name="dashboard_fragment_label">dashboard Fragment</string>
+    <string name="app_logo">Restro App</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="loading">loading</string>
+</resources>
