@@ -53,11 +53,11 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-        dataBinding =true
+        dataBinding = true
     }
 
     defaultConfig {
-        multiDexEnabled =true
+        multiDexEnabled = true
     }
 }
 
@@ -95,8 +95,8 @@ dependencies {
     implementation(libs.converter.scalars)
 
     // Hilt dependencies
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    kapt("com.google.dagger:hilt-android-compiler:2.56.2")
+    implementation(libs.hilt.android.v2562)
+    kapt(libs.hilt.android.compiler)
 
     //Reflection
     implementation(libs.kotlin.reflect)
@@ -131,4 +131,9 @@ dependencies {
 
     //lottie animation
     implementation(libs.lottie)
+
+    // socket.io
+    implementation("io.socket:socket.io-client:2.0.1") {
+        exclude(group = "org.json", module = "json")
+    }
 }

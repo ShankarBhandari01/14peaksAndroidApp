@@ -1,0 +1,125 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+
+        <variable
+            name="sales"
+            type="com.example.restro.model.Sales" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="7dp"
+        app:cardUseCompatPadding="true"
+        app:strokeColor="@color/teal_200"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Order ID -->
+            <TextView
+                android:id="@+id/orderId"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Order: ` + sales.orderId}"
+                android:textStyle="bold" />
+
+            <!-- Customer -->
+            <TextView
+                android:id="@+id/customerName"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{`Customer: ` + sales.customer.name}" />
+
+            <!-- Date & Amount Row -->
+            <LinearLayout
+                android:padding="@dimen/_5sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+                <TextView
+                    android:id="@+id/orderDate"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="0dp"
+                    android:padding="@dimen/_4sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@{`Date: ` + sales.updated_ts}" />
+
+                <TextView
+                    android:id="@+id/orderAmount"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="@{`Total: $` + sales.totalAmount}"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Order Status as Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/orderStatus"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{sales.status}"
+                android:textColor="@android:color/white"
+                app:chipBackgroundColor="@color/teal_200"
+                app:chipCornerRadius="8dp" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/ll_change_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_accept"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="Accept"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@android:color/holo_green_dark"
+                    app:cornerRadius="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_reject"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="Reject"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@android:color/holo_red_dark"
+                    app:cornerRadius="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>

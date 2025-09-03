@@ -55,8 +55,10 @@ class Constants {
          * API Lists
          */
         const val BASE_URL = "https://api.ravintola14peaks.fi/api/v1/"
+        const val WEB_SOCKET_URL = "https://api.ravintola14peaks.fi/"
         const val API_KEY = ""
         const val API_LOGON = "login"
+        const val API_GET_All_ORDERS = "AllOrders"
 
     }
 }

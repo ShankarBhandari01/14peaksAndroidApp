@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
-        android:name="com.example.restro.view.SecondFragment"
+        android:name="com.example.restro.view.DashboardFragment"
         android:label="@string/dashboard_fragment_label"
         tools:layout="@layout/dashboard_fragment">
 

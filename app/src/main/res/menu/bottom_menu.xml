@@ -1,18 +1,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Sales Order -->
     <item
-        android:id="@+id/menu_sales_order"
-        android:title="Sales Order"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/salesOrderFragment"
+        android:icon="@drawable/order_icon"
+        android:title="Sales Orders"
+        android:tooltipText="View sales orders"
+        app:showAsAction="ifRoom|withText" />
 
+    <!-- Reservation -->
     <item
-        android:id="@+id/menu_reservation"
-        android:title="Reservation"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/reservationFragment"
+        android:icon="@drawable/reservation"
+        android:title="Reservations"
+        android:tooltipText="Check reservations"
+        app:showAsAction="ifRoom|withText" />
 
+    <!-- Account -->
     <item
-        android:id="@+id/menu_account"
-        android:title="Account"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/accountFragment"
+        android:icon="@drawable/account"
+        android:title="My Account"
+        android:tooltipText="Manage account settings"
+        app:showAsAction="ifRoom|withText" />
 </menu>

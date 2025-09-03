@@ -4,15 +4,36 @@ import androidx.room.ColumnInfo
 import java.io.Serializable
 
 
-data class Data(
+data class UserResponse(
     val session: Session,
     val user: User
 ) : Serializable
 
-data class LoginResponse(
-    val `data`: Data,
+data class ApiResponse<T>(
+    val `data`: T,
     val message: String,
     val type: String
+) : Serializable
+
+
+data class SalesResponse(
+    val rsType: String,
+    val message: String,
+    val statusCode: String,
+    val data: List<Sales>,
+    val pagination: Pagination,
+    val countByStatus: List<CountByStatus>
+) : Serializable
+
+data class Pagination(
+    val currentPage: Int,
+    val totalPages: Int,
+    val totalCount: Int
+) : Serializable
+
+data class CountByStatus(
+    val count: Int,
+    val status: String
 ) : Serializable
 
 data class Session(

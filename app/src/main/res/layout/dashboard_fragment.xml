@@ -8,66 +8,87 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="@dimen/_85sdp"
+            app:collapsedTitleGravity="center_vertical"
+            app:collapsedTitleTextColor="@android:color/white"
+            app:contentScrim="@android:color/white"
+            app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <!-- Toolbar container -->
             <LinearLayout
                 android:id="@+id/toolbar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
+                <!-- Logo -->
                 <ImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:contentDescription="logo"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="fitStart"
                     android:src="@drawable/logo"
                     app:layout_collapseMode="parallax" />
 
+                <!-- Notifications button -->
                 <ImageButton
                     android:id="@+id/img_notification_btn"
-                    android:layout_width="@dimen/_56sdp"
-                    android:layout_height="@dimen/_56sdp"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="Notification"
-                    android:padding="12dp"
-                    android:backgroundTint="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:scaleType="centerInside"
+                    android:contentDescription="notification"
+                    android:padding="12dp"
                     android:src="@drawable/baseline_notifications_active_24"
                     app:layout_collapseMode="pin"
-                    app:tint="@android:color/black" />
-
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
-
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Content -->
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Fragment content goes here -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/dashboard_nav_host"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:navGraph="@navigation/bottom_nav_graph"
+            app:defaultNavHost="false"
+            android:layout_marginBottom="@dimen/_100sdp"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"/>
 
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:background="?attr/colorSurface"
+        app:itemIconTint="@color/bottom_nav_selector"
+        app:itemRippleColor="@color/teal_200"
+        app:itemTextColor="@color/bottom_nav_selector"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

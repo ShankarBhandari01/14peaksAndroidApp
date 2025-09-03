@@ -13,8 +13,8 @@ class ApiInterceptor(var context: Context) : Interceptor {
 
         newRequest = newRequest.newBuilder()
             .addHeader(
-                "AccessToken",
-                Constants.session.token
+                "authorization",
+                "Bearer " + Constants.session.token
             )
             .build()
 

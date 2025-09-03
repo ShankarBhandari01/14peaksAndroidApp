@@ -5,12 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.example.restro.R
 import com.example.restro.databinding.DashboardFragmentBinding
 import com.example.restro.model.User
+import dagger.hilt.android.AndroidEntryPoint
 
-class SecondFragment : Fragment() {
+@AndroidEntryPoint
+class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     private var _binding: DashboardFragmentBinding? = null
     private val binding get() = _binding!!
@@ -38,7 +42,32 @@ class SecondFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Toast.makeText(requireContext(), user?.name.toString(), Toast.LENGTH_SHORT).show()
+        setBottomNavigation()
+
+
+        savedInstanceState?.let {
+            binding.bottomNavigation.selectedItemId =
+                it.getInt("selectedTab", R.id.salesOrderFragment)
+        }
+    }
+
+
+    private fun setBottomNavigation() {
+        val navHostFragment =
+            childFragmentManager.findFragmentById(R.id.dashboard_nav_host) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        binding.bottomNavigation.setupWithNavController(navController)
+
+        // Ensure state is restored properly
+        binding.bottomNavigation.setOnItemReselectedListener {
+            // Prevent reloading the same fragment when reselecting
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("selectedTab", binding.bottomNavigation.selectedItemId)
     }
 
     override fun onDestroyView() {

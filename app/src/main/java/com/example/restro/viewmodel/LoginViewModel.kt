@@ -14,7 +14,6 @@ import com.example.restro.utils.NetWorkResult
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -94,9 +93,9 @@ class LoginViewModel @Inject constructor(
                             Constants.session.token = result.data.data.session.token
                             Constants.session.refreshToken = result.data.data.session.refreshToken
 
-                            // Navigate to Fragment or Activity
+                            // Navigate to Fragment
                             _uiEvents.value = UiEvent.Navigate(
-                                user = result.data.data.user,
+                                data = result.data.data.user,
                                 destinationId = R.id.dashboardFragment,
                                 popUpToId = R.id.loginFragment
                             )
@@ -110,7 +109,7 @@ class LoginViewModel @Inject constructor(
                     is NetWorkResult.Error -> _uiEvents.value =
                         UiEvent.ShowMessage(result.message ?: "Login failed")
 
-                    is NetWorkResult.Loading -> {} // Already handled
+                    is NetWorkResult.Loading -> {}
                 }
             } catch (e: Exception) {
                 _uiEvents.value = UiEvent.HideLoading

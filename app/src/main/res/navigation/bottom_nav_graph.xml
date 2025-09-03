@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_nav_graph"
+    app:startDestination="@id/salesOrderFragment">
+
+    <fragment
+        android:id="@+id/salesOrderFragment"
+        android:name="com.example.restro.view.SalesOrderFragment"
+        android:label="Orders" />
+
+    <fragment
+        android:id="@+id/reservationFragment"
+        android:name="com.example.restro.view.ReservationFragment"
+        android:label="Reservations" />
+
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.example.restro.view.AccountFragment"
+        android:label="Account" />
+</navigation>

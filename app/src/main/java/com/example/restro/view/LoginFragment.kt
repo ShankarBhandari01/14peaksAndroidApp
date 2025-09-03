@@ -88,15 +88,17 @@ class LoginFragment : Fragment() {
                 is UiEvent.Navigate -> {
 
                     val bundle = Bundle()
-                    bundle.putSerializable("user", event.user)
+                    bundle.putSerializable("user", event.data)
 
-                    findNavController().navigate(
-                        event.destinationId,
-                        bundle,
-                        event.popUpToId?.let { popId ->
-                            NavOptions.Builder().setPopUpTo(popId, true).build()
-                        }
-                    )
+                    event.destinationId?.let {
+                        findNavController().navigate(
+                            it,
+                            bundle,
+                            event.popUpToId?.let { popId ->
+                                NavOptions.Builder().setPopUpTo(popId, true).build()
+                            }
+                        )
+                    }
                 }
 
                 is UiEvent.NavigateToActivity -> {}

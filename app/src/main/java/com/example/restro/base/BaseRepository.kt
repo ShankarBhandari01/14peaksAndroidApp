@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import retrofit2.Response
 
+
 open class BaseRepository {
 
     inline fun <reified T : Any> baseResponse(
