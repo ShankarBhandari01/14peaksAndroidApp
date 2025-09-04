@@ -5,6 +5,7 @@ import com.example.restro.base.BaseRepository
 import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.model.ApiResponse
 import com.example.restro.model.LoginUser
+import com.example.restro.model.Session
 import com.example.restro.model.UserResponse
 import com.example.restro.utils.NetWorkResult
 import dagger.hilt.android.scopes.ActivityRetainedScoped
@@ -21,6 +22,12 @@ class LoginRepo @Inject constructor(
     suspend fun login(login: LoginUser): Flow<NetWorkResult<ApiResponse<UserResponse>>> {
         return baseResponse(networkHelper.isNetworkConnected()) {
             apisServicesImpl.login(login = login)
+        }
+    }
+
+    suspend fun refreshToken(): Flow<NetWorkResult<ApiResponse<Session>>> {
+        return baseResponse(networkHelper.isNetworkConnected()) {
+            apisServicesImpl.refreshToken()
         }
     }
 

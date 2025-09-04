@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,14 +12,17 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.restro.R
 import com.example.restro.databinding.ActivityMainBinding
+import com.example.restro.viewmodel.OfflineDatabaseViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private  val binding by lazy {
+    private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
+    private val offlineViewModel by viewModels<OfflineDatabaseViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

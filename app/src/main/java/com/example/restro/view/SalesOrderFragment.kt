@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.restro.R
 import com.example.restro.databinding.FragmentSalesOrderBinding
 import com.example.restro.model.Sales
@@ -21,6 +24,7 @@ import com.example.restro.viewmodel.SocketIOViewModel
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -29,7 +33,9 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     private val TAG = "SalesOrderFragment"
     private var _binding: FragmentSalesOrderBinding? = null
     private val binding get() = _binding!!
-    private val WebSocketViewModel: SocketIOViewModel by activityViewModels()
+
+    // shared across multiple fragments
+    private val socketIOViewModel: SocketIOViewModel by activityViewModels()
 
     private val activeFilters = mutableListOf<String>()
 
@@ -63,9 +69,24 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
             bottomSheet.show(childFragmentManager, "FilterBottomSheet")
         }
 
-        // Connect WebSocket
-        WebSocketViewModel.connect()
+        observeSocketIO()
     }
+
+    // observe sales order changes
+    private fun observeSocketIO() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                socketIOViewModel.latestMessage.collect { message ->
+                    if (message != null) {
+                        Timber.d("New socket message: $message")
+                        // TODO: parse message -> update salesList or notify adapter
+                    }
+                }
+            }
+        }
+    }
+
 
     private fun refreshRecyclerView() {
         adapter = SalesOrderAdapter(salesList)
@@ -100,8 +121,8 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                 is UiEvent.HideLoading -> Utils.dismissProgressDialog()
                 is UiEvent.ShowMessage -> {
                     Timber.tag(TAG).e("observeUiEvents: ${event.message} ")
-                    Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT).show()
-
+                    Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 is UiEvent.Navigate -> {
@@ -117,9 +138,9 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
+        socketIOViewModel.disconnect()
         _binding = null
     }
 }

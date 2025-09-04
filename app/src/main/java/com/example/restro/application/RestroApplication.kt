@@ -6,10 +6,9 @@ import cat.ereza.customactivityoncrash.activity.DefaultErrorActivity
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.example.restro.BuildConfig
 import com.example.restro.utils.Constants
+import com.example.restro.utils.Constants.Companion.supervisedScope
 import com.example.restro.utils.Utils
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.danlew.android.joda.JodaTimeInitializer
 import timber.log.Timber
@@ -23,9 +22,8 @@ class RestroApplication : Application() {
         manageCrashingActivity()
 
         // assign device id to static variable
-        CoroutineScope(Dispatchers.IO).launch {
+        supervisedScope.launch {
             val deviceInfo = Constants.deviceInfo
-
             deviceInfo.platform = "android"
             deviceInfo.deviceId = Utils.extractDeviceId(this@RestroApplication)
         }

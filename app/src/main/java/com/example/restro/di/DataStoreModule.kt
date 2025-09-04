@@ -1,5 +1,7 @@
 package com.example.restro.di
 
+import com.example.restro.local.OfflineStoreImpl
+import com.example.restro.repos.OfflineStoreInterface
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -10,7 +12,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class DataStoreModule {
 
-    //@Singleton
-   // @Binds
-   // abstract fun bindDataStore(dataStoreImpl: OfflineStoreImpl): OfflineStoreRepository
+    @Singleton
+    @Binds
+    abstract fun bindDataStore(dataStoreImpl: OfflineStoreImpl): OfflineStoreInterface
 }

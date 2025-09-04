@@ -49,6 +49,7 @@ class LoginViewModel @Inject constructor(
         addSource(_passwordError) { update() }
     }
 
+
     fun validateData(): Boolean {
         _emailError.value = null
         _passwordError.value = null
@@ -89,13 +90,13 @@ class LoginViewModel @Inject constructor(
                 when (result) {
                     is NetWorkResult.Success -> {
                         if (result.data.type == "success") {
-                            // Save session
+                            // Save session data
                             Constants.session.token = result.data.data.session.token
                             Constants.session.refreshToken = result.data.data.session.refreshToken
 
                             // Navigate to Fragment
                             _uiEvents.value = UiEvent.Navigate(
-                                data = result.data.data.user,
+                                data = result.data.data,
                                 destinationId = R.id.dashboardFragment,
                                 popUpToId = R.id.loginFragment
                             )

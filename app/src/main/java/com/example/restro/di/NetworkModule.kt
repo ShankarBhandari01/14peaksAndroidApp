@@ -2,6 +2,7 @@ package com.example.restro.di
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.example.restro.apis.ApisServicesImpl
 import com.example.restro.di.intercepter.ApiInterceptor
 import com.example.restro.di.intercepter.ApiInterceptorQualifier
 import com.example.restro.service.ApiService
@@ -11,11 +12,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.ConnectionPool
+import okhttp3.Dispatcher
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -40,20 +44,29 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor,
         @ApiInterceptorQualifier apiInterceptor: Interceptor
     ): OkHttpClient {
+        val dispatcher = Dispatcher(Executors.newFixedThreadPool(10)).apply {
+            maxRequests = 10
+            maxRequestsPerHost = 5
+        }
+        val connectionPool = ConnectionPool(100, 30, TimeUnit.SECONDS)
+
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(apiInterceptor)
-            .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(chuckerInterceptor)
-            .connectTimeout(60, TimeUnit.SECONDS)
+            .dispatcher(dispatcher)
+            .connectionPool(connectionPool)
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
             .build()
     }
 
     @ApiInterceptorQualifier
     @Singleton
     @Provides
-    fun providesApiKeyInterceptor(@ApplicationContext context: Context): Interceptor =
-        ApiInterceptor(context)
+    fun providesApiKeyInterceptor(): Interceptor = ApiInterceptor()
 
     @Singleton
     @Provides
@@ -73,4 +86,6 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+
+
 }

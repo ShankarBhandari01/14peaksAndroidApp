@@ -1,17 +1,24 @@
 package com.example.restro.view
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.databinding.DashboardFragmentBinding
 import com.example.restro.model.User
+import com.example.restro.viewmodel.OfflineDatabaseViewModel
+import com.example.restro.viewmodel.SocketIOViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
@@ -20,16 +27,10 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
     private val binding get() = _binding!!
     private var user: User? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    // shared across multiple fragments
+    private val offlineDatabaseViewModel by activityViewModels<OfflineDatabaseViewModel>()
+    private val socketIOViewModel: SocketIOViewModel by activityViewModels()
 
-        user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("user", User::class.java)
-        } else {
-            arguments?.getSerializable("user") as User?
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +44,12 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setBottomNavigation()
-
+        // get user from local room database
+        offlineDatabaseViewModel.getUser.observe(viewLifecycleOwner) { user ->
+            user ?: return@observe
+            this.user = user
+            connectSocketIo(user._id!!)
+        }
 
         savedInstanceState?.let {
             binding.bottomNavigation.selectedItemId =
@@ -51,6 +57,37 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         }
     }
 
+    private fun connectSocketIo(userId: String) {
+        // Connect Socket
+        socketIOViewModel.connect(userId)
+
+        // Observe notification messages
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                launch {
+                    socketIOViewModel.isConnected.collect { connected ->
+                        if (connected) {
+                            Timber.d(" Socket connected")
+                        } else {
+                            Timber.d(" Socket disconnected")
+                        }
+                    }
+                }
+
+                // observe notification changes
+                launch {
+                    socketIOViewModel.latestMessage.collect { message ->
+                        if (message != null) {
+                            Timber.d("New socket message: $message")
+                            // TODO: parse message -> update salesList or notify adapter
+                        }
+                    }
+                }
+
+            }
+        }
+    }
 
     private fun setBottomNavigation() {
         val navHostFragment =
@@ -61,7 +98,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
         // Ensure state is restored properly
         binding.bottomNavigation.setOnItemReselectedListener {
-            // Prevent reloading the same fragment when reselecting
+            // Prevent reloading the same fragment when reSelecting
         }
     }
 
@@ -72,6 +109,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        socketIOViewModel.disconnect()
         _binding = null
     }
 }

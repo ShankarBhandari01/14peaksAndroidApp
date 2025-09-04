@@ -7,14 +7,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.restro.R
 import com.example.restro.databinding.LoginFragmentBinding
+import com.example.restro.model.UserResponse
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
 import com.example.restro.viewmodel.LoginViewModel
+import com.example.restro.viewmodel.OfflineDatabaseViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +25,8 @@ class LoginFragment : Fragment() {
     private var _binding: LoginFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel by viewModels<LoginViewModel>()
+
+    private val offlineViewModel by activityViewModels<OfflineDatabaseViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,14 +91,20 @@ class LoginFragment : Fragment() {
                 ).show()
 
                 is UiEvent.Navigate -> {
+                    // save user id to local storage
+                    val userResponse = event.data as UserResponse
+                    offlineViewModel.saveUserId(userResponse.user._id!!)
+                    offlineViewModel.saveUser(userResponse.user)
 
-                    val bundle = Bundle()
-                    bundle.putSerializable("user", event.data)
-
+                    // set first launch false
+                    offlineViewModel.setFirstLaunch(false)
+                    // set user session
+                    offlineViewModel.saveSession(userResponse.session)
+                    // navigate to dashboard
                     event.destinationId?.let {
                         findNavController().navigate(
                             it,
-                            bundle,
+                            null,
                             event.popUpToId?.let { popId ->
                                 NavOptions.Builder().setPopUpTo(popId, true).build()
                             }

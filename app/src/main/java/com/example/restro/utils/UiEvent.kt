@@ -13,6 +13,6 @@ sealed class UiEvent {
 
     data class NavigateToActivity(
         val activityClass: Class<*>,      // Target Activity
-        val finishCurrent: Boolean = false // Optional: finish current Activity
+        val finishCurrent: Boolean = false // finish current Activity
     ) : UiEvent()
 }

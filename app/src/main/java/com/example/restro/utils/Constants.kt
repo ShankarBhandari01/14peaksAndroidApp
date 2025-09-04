@@ -2,6 +2,9 @@ package com.example.restro.utils
 
 import com.example.restro.model.DeviceInfo
 import com.example.restro.model.Session
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class Constants {
     companion object {
@@ -40,7 +43,7 @@ class Constants {
         /**
          * Offline Values Lists
          * */
-        const val USER_PREFERENCES = "USER_LOGIN"
+        const val USER_PREFERENCES = "USER_PREFERENCES"
         const val OFFLINE_DATABASE = "app_database"
         const val NOTE_TABLE = "NOTE_TABLE"
 
@@ -59,6 +62,10 @@ class Constants {
         const val API_KEY = ""
         const val API_LOGON = "login"
         const val API_GET_All_ORDERS = "AllOrders"
+        const val API_REFRESH_TOKEN = "/token/refresh"
 
+
+        // Structured scope for background work
+        val supervisedScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 }
