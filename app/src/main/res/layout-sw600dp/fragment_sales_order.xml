@@ -60,6 +60,7 @@
         android:clipToPadding="false"
         android:paddingBottom="@dimen/_8sdp"
         android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:spanCount="2"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
 
 </LinearLayout>
