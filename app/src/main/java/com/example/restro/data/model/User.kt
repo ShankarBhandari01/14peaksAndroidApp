@@ -1,4 +1,4 @@
-package com.example.restro.model
+package com.example.restro.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

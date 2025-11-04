@@ -1,6 +1,6 @@
 package com.example.restro.apis
 
-import com.example.restro.model.LoginUser
+import com.example.restro.data.model.LoginUser
 import com.example.restro.service.ApiService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,4 +17,10 @@ class ApisServicesImpl @Inject constructor(private val apiService: ApiService) {
         page: Int,
         limit: Int
     ) = apiService.getAllOrders(sort, page, limit)
+
+    suspend fun getNotifications(
+        page: Int,
+        limit: Int
+    ) = apiService.getNotifications(page, limit)
+
 }

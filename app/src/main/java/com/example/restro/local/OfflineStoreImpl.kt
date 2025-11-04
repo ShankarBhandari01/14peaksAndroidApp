@@ -7,8 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.restro.base.BaseRepository
-import com.example.restro.model.Session
-import com.example.restro.model.User
+import com.example.restro.data.model.Session
+import com.example.restro.data.model.User
 import com.example.restro.repos.OfflineStoreInterface
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class OfflineStoreImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val userDao: UserDao

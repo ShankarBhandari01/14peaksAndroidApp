@@ -1,4 +1,4 @@
-package com.example.restro.model
+package com.example.restro.data.model
 
 data class ItemsData(
     val _id: String,

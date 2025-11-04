@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.restro.databinding.SalesListViewBinding
-import com.example.restro.model.Sales
+import com.example.restro.data.model.Sales
 
 
 class SalesOrderAdapter(private val sales: List<Sales>) :
@@ -26,6 +26,12 @@ class SalesOrderAdapter(private val sales: List<Sales>) :
     override fun onBindViewHolder(holder: SalesViewHolder, position: Int) {
         val sale = sales[position]
         holder.binding.sales = sale
+
+        if (sale.status.lowercase() == "accepted") {
+            holder.binding.llChangeStatus.visibility = ViewGroup.GONE
+        } else {
+            holder.binding.llChangeStatus.visibility = ViewGroup.VISIBLE
+        }
 
         holder.binding.orderStatus.setTextColor(
             when (sale.status.lowercase()) {

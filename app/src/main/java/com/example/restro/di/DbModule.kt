@@ -3,7 +3,7 @@ package com.example.restro.di
 import android.content.Context
 import androidx.room.Room
 import com.example.restro.local.OfflineDatabase
-import com.example.restro.model.User
+import com.example.restro.data.model.User
 import com.example.restro.utils.Constants.Companion.OFFLINE_DATABASE
 import dagger.Module
 import dagger.Provides

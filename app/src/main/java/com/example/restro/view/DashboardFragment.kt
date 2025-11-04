@@ -12,8 +12,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
+import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
-import com.example.restro.model.User
 import com.example.restro.viewmodel.OfflineDatabaseViewModel
 import com.example.restro.viewmodel.SocketIOViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +26,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
     private var _binding: DashboardFragmentBinding? = null
     private val binding get() = _binding!!
     private var user: User? = null
+
 
     // shared across multiple fragments
     private val offlineDatabaseViewModel by activityViewModels<OfflineDatabaseViewModel>()
@@ -54,6 +55,11 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         savedInstanceState?.let {
             binding.bottomNavigation.selectedItemId =
                 it.getInt("selectedTab", R.id.salesOrderFragment)
+        }
+
+
+        binding.imgNotificationBtn.setOnClickListener {
+            startActivity(NotificationActivity.getIntent(requireContext()))
         }
     }
 
@@ -109,7 +115,11 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        socketIOViewModel.disconnect()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        socketIOViewModel.disconnect()
     }
 }

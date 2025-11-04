@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.restro.R
 import com.example.restro.databinding.FragmentSalesOrderBinding
-import com.example.restro.model.Sales
-import com.example.restro.model.SalesResponse
+import com.example.restro.data.model.Sales
+import com.example.restro.data.model.ApiResponse
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
 import com.example.restro.view.adapters.SalesOrderAdapter
@@ -126,7 +126,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                 }
 
                 is UiEvent.Navigate -> {
-                    val salesData = event.data as SalesResponse
+                    val salesData = event.data as ApiResponse<Sales>
                     Timber.tag(TAG).e("observeUiEvents: ${Gson().toJson(salesData)} ")
                     salesList.clear()
                     salesList.addAll(salesData.data)

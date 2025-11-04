@@ -1,4 +1,4 @@
-package com.example.restro.model
+package com.example.restro.data.model
 
 import androidx.room.ColumnInfo
 import java.io.Serializable
@@ -9,18 +9,18 @@ data class UserResponse(
     val user: User
 ) : Serializable
 
-data class ApiResponse<T>(
+data class ApiWrapper<T>(
     val `data`: T,
     val message: String,
     val type: String
 ) : Serializable
 
 
-data class SalesResponse(
+data class ApiResponse<T>(
     val rsType: String,
     val message: String,
     val statusCode: String,
-    val data: List<Sales>,
+    val data: List<T>,
     val pagination: Pagination,
     val countByStatus: List<CountByStatus>
 ) : Serializable

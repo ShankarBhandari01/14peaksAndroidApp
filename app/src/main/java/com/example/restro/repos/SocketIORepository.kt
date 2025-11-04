@@ -1,10 +1,19 @@
 package com.example.restro.repos
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.example.restro.apis.ApisServicesImpl
+import com.example.restro.base.BaseRepository
+import com.example.restro.data.model.Notification
+import com.example.restro.data.paging.NotificationPagingSource
+import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.utils.Constants
 import com.example.restro.utils.Constants.Companion.supervisedScope
 import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,15 +26,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SocketIORepository @Inject constructor() {
+class SocketIORepository @Inject constructor(
+    private val apisServicesImpl: ApisServicesImpl, private val networkHelper: NetworkHelper
+) : BaseRepository() {
 
     private var socket: Socket? = null
     private val gson = Gson()
 
     // Message flow with buffer
     private val _messages = MutableSharedFlow<String>(
-        replay = 0,
-        extraBufferCapacity = 64
+        replay = 0, extraBufferCapacity = 64
     )
 
     val messages: SharedFlow<String> = _messages.asSharedFlow()
@@ -33,6 +43,15 @@ class SocketIORepository @Inject constructor() {
     // Connection state as StateFlow
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
+
+
+    // load notifications from api call
+    fun getApiNotifications(
+        limit: Int = 10
+    ): Flow<PagingData<Notification>> {
+        return Pager(config = PagingConfig(pageSize = limit, enablePlaceholders = false),
+            pagingSourceFactory = { NotificationPagingSource(apisServicesImpl) }).flow
+    }
 
     @Synchronized
     fun connect(userId: String) {
@@ -100,4 +119,6 @@ class SocketIORepository @Inject constructor() {
         disconnect()
         connect(userId)
     }
+
+
 }

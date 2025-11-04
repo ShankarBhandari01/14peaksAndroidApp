@@ -2,11 +2,13 @@ package com.example.restro.di
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.example.restro.apis.ApisServicesImpl
+import com.example.restro.BuildConfig
 import com.example.restro.di.intercepter.ApiInterceptor
 import com.example.restro.di.intercepter.ApiInterceptorQualifier
 import com.example.restro.service.ApiService
-import com.example.restro.utils.Constants.Companion.BASE_URL
+import com.example.restro.service.TokenAuthenticator
+import com.example.restro.utils.Constants.Companion.DEV_BASE_URL
+import com.example.restro.utils.Constants.Companion.LIVE_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +29,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+
     @Provides
     fun providesLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -42,6 +45,7 @@ object NetworkModule {
     fun provideHttpClient(
         chuckerInterceptor: ChuckerInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
+        authenticator: TokenAuthenticator,
         @ApiInterceptorQualifier apiInterceptor: Interceptor
     ): OkHttpClient {
         val dispatcher = Dispatcher(Executors.newFixedThreadPool(10)).apply {
@@ -56,10 +60,11 @@ object NetworkModule {
             .addInterceptor(chuckerInterceptor)
             .dispatcher(dispatcher)
             .connectionPool(connectionPool)
-            .connectTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
+            .authenticator(authenticator)
             .build()
     }
 
@@ -77,7 +82,7 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient, gsonConverterFactory: GsonConverterFactory
     ): Retrofit {
-        return Retrofit.Builder().baseUrl(BASE_URL)
+        return Retrofit.Builder().baseUrl(if (BuildConfig.DEBUG) DEV_BASE_URL else LIVE_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(gsonConverterFactory)
             .build()

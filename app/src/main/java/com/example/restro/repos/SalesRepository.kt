@@ -3,8 +3,9 @@ package com.example.restro.repos
 import com.example.restro.apis.ApisServicesImpl
 import com.example.restro.base.BaseRepository
 import com.example.restro.di.intercepter.NetworkHelper
-import com.example.restro.model.ApiResponse
-import com.example.restro.model.SalesResponse
+import com.example.restro.data.model.ApiWrapper
+import com.example.restro.data.model.ApiResponse
+import com.example.restro.data.model.Sales
 import com.example.restro.utils.NetWorkResult
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.Flow
@@ -20,9 +21,10 @@ class SalesRepository @Inject constructor(
         sort: String,
         page: Int,
         limit: Int
-    ): Flow<NetWorkResult<ApiResponse<SalesResponse>>> {
+    ): Flow<NetWorkResult<ApiWrapper<ApiResponse<Sales>>>> {
         return baseResponse(networkHelper.isNetworkConnected()) {
             apisServicesImpl.getSalesOrdersList(sort, page, limit)
         }
     }
+
 }

@@ -13,9 +13,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.restro.R
 import com.example.restro.databinding.LoginFragmentBinding
-import com.example.restro.model.UserResponse
+import com.example.restro.data.model.UserResponse
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
+import com.example.restro.utils.Utils.getGreetingMessage
 import com.example.restro.viewmodel.LoginViewModel
 import com.example.restro.viewmodel.OfflineDatabaseViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +49,10 @@ class LoginFragment : Fragment() {
                 viewModel.login()
             }
         }
+
+        // welcome message
+        binding.welcomeText.text = getGreetingMessage()
+
         disableLoginButton()
         observeViewModel()
     }

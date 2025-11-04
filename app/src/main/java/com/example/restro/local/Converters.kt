@@ -1,7 +1,7 @@
 package com.example.restro.local
 
 import androidx.room.TypeConverter
-import com.example.restro.model.MenuRight
+import com.example.restro.data.model.MenuRight
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

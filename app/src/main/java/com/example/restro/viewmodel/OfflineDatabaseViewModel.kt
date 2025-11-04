@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.restro.model.Session
-import com.example.restro.model.User
+import com.example.restro.data.model.Session
+import com.example.restro.data.model.User
 import com.example.restro.repos.OfflineStoreInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

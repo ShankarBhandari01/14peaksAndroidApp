@@ -1,7 +1,7 @@
 package com.example.restro.repos
 
-import com.example.restro.model.Session
-import com.example.restro.model.User
+import com.example.restro.data.model.Session
+import com.example.restro.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface OfflineStoreInterface {

@@ -71,7 +71,7 @@ object Utils {
             in 12..15 -> "Good Afternoon"
             in 16..19 -> "Good Evening"
             in 20..23 -> "Good Night"
-            else -> "Hello"
+            else -> "welcome_back"
         }
     }
 

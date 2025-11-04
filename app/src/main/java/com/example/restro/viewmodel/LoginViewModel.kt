@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.restro.R
 import com.example.restro.base.BaseViewmodel
-import com.example.restro.model.LoginUser
+import com.example.restro.data.model.LoginUser
 import com.example.restro.repos.LoginRepo
 import com.example.restro.utils.Constants
 import com.example.restro.utils.NetWorkResult
@@ -25,8 +25,8 @@ class LoginViewModel @Inject constructor(
     application: Application
 ) : BaseViewmodel(application) {
 
-    val email = MutableLiveData<String>("Waiter@gmail.com")
-    val password = MutableLiveData<String>("Waiter@12345")
+    val email = MutableLiveData<String>("shankar123@gmail.com")
+    val password = MutableLiveData<String>("Shankar@12345")
 
     private val _emailError = MutableLiveData<String?>()
     val emailError: LiveData<String?> = _emailError
@@ -43,6 +43,7 @@ class LoginViewModel @Inject constructor(
                 _emailError.value == null && _passwordError.value == null && !email.value.isNullOrEmpty() &&
                         !password.value.isNullOrEmpty()
         }
+
         addSource(email) { update() }
         addSource(password) { update() }
         addSource(_emailError) { update() }

@@ -1,0 +1,43 @@
+package com.example.restro.data.paging
+
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import com.example.restro.apis.ApisServicesImpl
+import com.example.restro.data.model.Notification
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+class NotificationPagingSource @Inject constructor(
+    private val apisServicesImpl: ApisServicesImpl
+) : PagingSource<Int, Notification>() {
+
+    // refresh key
+    override fun getRefreshKey(state: PagingState<Int, Notification>): Int? {
+        return state.anchorPosition?.let { position ->
+            state.closestPageToPosition(position)?.prevKey?.plus(1) ?: state.closestPageToPosition(
+                position
+            )?.nextKey?.minus(1)
+        }
+    }
+
+    // load data
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Notification> {
+        return try {
+            val page = params.key ?: 1
+            val limit = params.loadSize
+
+            val response = apisServicesImpl.getNotifications(page = page, limit = limit)
+            val pagination = response.data.pagination
+            val notification = response.data.data
+            val nextKey = if (page < pagination.totalPages) page + 1 else null
+
+            LoadResult.Page(
+                data = notification,
+                prevKey = if (page == 1) null else page - 1,
+                nextKey = nextKey
+            )
+        } catch (e: Exception) {
+            LoadResult.Error(e)
+        }
+    }
+}
