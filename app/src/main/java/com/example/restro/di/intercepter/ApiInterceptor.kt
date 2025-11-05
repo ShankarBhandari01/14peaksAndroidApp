@@ -1,6 +1,6 @@
 package com.example.restro.di.intercepter
 
-import com.example.restro.utils.Constants.Companion.session
+import com.example.restro.utils.ConstantsValues.Companion.session
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject

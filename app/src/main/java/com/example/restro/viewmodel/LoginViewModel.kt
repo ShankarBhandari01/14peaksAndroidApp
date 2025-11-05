@@ -9,7 +9,7 @@ import com.example.restro.R
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.LoginUser
 import com.example.restro.repos.LoginRepo
-import com.example.restro.utils.Constants
+import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.NetWorkResult
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
@@ -75,7 +75,7 @@ class LoginViewModel @Inject constructor(
             email = email.value.toString(),
             password = password.value.toString(),
             fcmToken = "",
-            deviceInfo = Constants.deviceInfo
+            deviceInfo = ConstantsValues.deviceInfo
         )
     }
 
@@ -92,8 +92,8 @@ class LoginViewModel @Inject constructor(
                     is NetWorkResult.Success -> {
                         if (result.data.type == "success") {
                             // Save session data
-                            Constants.session.token = result.data.data.session.token
-                            Constants.session.refreshToken = result.data.data.session.refreshToken
+                            ConstantsValues.session.token = result.data.data.session.token
+                            ConstantsValues.session.refreshToken = result.data.data.session.refreshToken
 
                             // Navigate to Fragment
                             _uiEvents.value = UiEvent.Navigate(

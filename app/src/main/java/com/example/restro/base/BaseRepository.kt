@@ -1,6 +1,6 @@
 package com.example.restro.base
 
-import com.example.restro.utils.Constants
+import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.NetWorkResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ open class BaseRepository {
         crossinline call: suspend () -> Response<T>
     ): Flow<NetWorkResult<T>> = flow {
         if (!hasInternetConnection) {
-            emit(NetWorkResult.Error(Constants.API_INTERNET_MESSAGE))
+            emit(NetWorkResult.Error(ConstantsValues.API_INTERNET_MESSAGE))
             return@flow
         }
         emit(NetWorkResult.Loading)

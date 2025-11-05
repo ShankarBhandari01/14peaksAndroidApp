@@ -15,7 +15,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_80sdp"
+            android:layout_height="@dimen/_60sdp"
             app:collapsedTitleGravity="center_vertical"
             app:collapsedTitleTextColor="@android:color/white"
             app:contentScrim="@android:color/white"
@@ -28,8 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="@dimen/_8sdp">
+                android:orientation="horizontal">
 
                 <!-- Logo -->
                 <ImageView
@@ -52,8 +51,8 @@
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="TODO"
-                        android:padding="@dimen/_12sdp"
                         android:scaleType="centerInside"
+                        android:padding="@dimen/_12ssp"
                         android:src="@drawable/baseline_notifications_active_24"
                         app:tint="?attr/colorOnSurface" />
 
@@ -66,7 +65,7 @@
                         android:gravity="center"
                         android:text="2"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/_10ssp"
+                        android:textSize="@dimen/_5ssp"
                         android:visibility="visible" />
                 </FrameLayout>
             </LinearLayout>
@@ -79,6 +78,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.fragment.app.FragmentContainerView
@@ -86,11 +87,8 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/_80sdp"
             app:defaultNavHost="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-            app:layout_constraintTop_toBottomOf="@id/appBarLayout"
             app:navGraph="@navigation/bottom_nav_graph" />
 
     </androidx.core.widget.NestedScrollView>
@@ -103,7 +101,7 @@
         android:layout_gravity="bottom"
         android:background="?attr/colorSurface"
         app:itemIconTint="@color/bottom_nav_selector"
-        app:itemRippleColor="@color/teal_200"
+        app:itemRippleColor="@color/gray"
         app:itemTextColor="@color/bottom_nav_selector"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_menu" />

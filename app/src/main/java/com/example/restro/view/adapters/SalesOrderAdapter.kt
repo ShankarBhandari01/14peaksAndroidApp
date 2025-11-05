@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.restro.databinding.SalesListViewBinding
 import com.example.restro.data.model.Sales
+import androidx.core.graphics.toColorInt
 
 
 class SalesOrderAdapter(private val sales: List<Sales>) :
@@ -35,9 +36,9 @@ class SalesOrderAdapter(private val sales: List<Sales>) :
 
         holder.binding.orderStatus.setTextColor(
             when (sale.status.lowercase()) {
-                "delivered" -> Color.parseColor("#388E3C")
-                "pending" -> Color.parseColor("#FBC02D")
-                "cancelled" -> Color.parseColor("#D32F2F")
+                "delivered" -> "#388E3C".toColorInt()
+                "pending" -> "#FBC02D".toColorInt()
+                "cancelled" -> "#D32F2F".toColorInt()
                 else -> Color.BLACK
             }
         )

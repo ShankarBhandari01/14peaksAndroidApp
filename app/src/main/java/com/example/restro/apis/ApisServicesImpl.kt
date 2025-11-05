@@ -23,4 +23,9 @@ class ApisServicesImpl @Inject constructor(private val apiService: ApiService) {
         limit: Int
     ) = apiService.getNotifications(page, limit)
 
+
+    suspend fun getAllReservation(
+        page: Int,
+        limit: Int
+    ) = apiService.getAllReservation(page, limit)
 }

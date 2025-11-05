@@ -17,7 +17,7 @@ class LoadingStateAdapter(private val retry: () -> Unit) :
     override fun onBindViewHolder(holder: LoadingViewHolder, loadState: LoadState) {
         if (loadState is LoadState.Error) {
             Utils.showAlertDialog(
-                message = loadState.error.localizedMessage?.toString(),
+                message = loadState.error.localizedMessage,
                 context = holder.itemView.context
             )
         }

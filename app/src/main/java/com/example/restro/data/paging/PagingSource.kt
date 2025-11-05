@@ -2,17 +2,14 @@ package com.example.restro.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.restro.apis.ApisServicesImpl
-import com.example.restro.data.model.Notification
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import com.example.restro.data.model.ApiResponse
 
-class NotificationPagingSource @Inject constructor(
-    private val apisServicesImpl: ApisServicesImpl
-) : PagingSource<Int, Notification>() {
+class PagingSource<T : Any>(
+    private val fetchData: suspend (page: Int, limit: Int) -> ApiResponse<T>
+) : PagingSource<Int, T>() {
 
     // refresh key
-    override fun getRefreshKey(state: PagingState<Int, Notification>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, T>): Int? {
         return state.anchorPosition?.let { position ->
             state.closestPageToPosition(position)?.prevKey?.plus(1) ?: state.closestPageToPosition(
                 position
@@ -21,14 +18,15 @@ class NotificationPagingSource @Inject constructor(
     }
 
     // load data
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Notification> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
         return try {
             val page = params.key ?: 1
             val limit = params.loadSize
 
-            val response = apisServicesImpl.getNotifications(page = page, limit = limit)
-            val pagination = response.data.pagination
-            val notification = response.data.data
+            val response = fetchData(page, limit)
+
+            val pagination = response.pagination
+            val notification = response.data
             val nextKey = if (page < pagination.totalPages) page + 1 else null
 
             LoadResult.Page(

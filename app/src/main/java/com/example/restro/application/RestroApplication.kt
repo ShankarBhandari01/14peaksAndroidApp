@@ -5,8 +5,8 @@ import androidx.startup.AppInitializer
 import cat.ereza.customactivityoncrash.activity.DefaultErrorActivity
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.example.restro.BuildConfig
-import com.example.restro.utils.Constants
-import com.example.restro.utils.Constants.Companion.supervisedScope
+import com.example.restro.utils.ConstantsValues
+import com.example.restro.utils.ConstantsValues.Companion.supervisedScope
 import com.example.restro.utils.Utils
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ class RestroApplication : Application() {
 
         // assign device id to static variable
         supervisedScope.launch {
-            val deviceInfo = Constants.deviceInfo
+            val deviceInfo = ConstantsValues.deviceInfo
             deviceInfo.platform = "android"
             deviceInfo.deviceId = Utils.extractDeviceId(this@RestroApplication)
         }

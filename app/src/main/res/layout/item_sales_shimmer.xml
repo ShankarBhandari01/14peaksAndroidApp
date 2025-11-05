@@ -1,0 +1,93 @@
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shimmerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:padding="8dp"
+    app:shimmer_auto_start="true"
+    app:shimmer_base_alpha="0.7"
+    app:shimmer_highlight_alpha="1.0">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="7dp"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Order ID -->
+            <View
+                android:layout_width="180dp"
+                android:layout_height="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shimmer_bg" />
+
+            <!-- Customer -->
+            <View
+                android:layout_width="140dp"
+                android:layout_height="14dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/shimmer_bg" />
+
+            <!-- Date & Amount Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shimmer_bg" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="14dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shimmer_bg" />
+            </LinearLayout>
+
+            <!-- Order Status (Chip Placeholder) -->
+            <View
+                android:layout_width="80dp"
+                android:layout_height="28dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/shimmer_chip_bg" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shimmer_button_bg" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shimmer_button_bg" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</com.facebook.shimmer.ShimmerFrameLayout>

@@ -139,6 +139,9 @@ dependencies {
         exclude(group = "org.json", module = "json")
     }
     // paging 3
-    implementation (libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.runtime)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
+// shimmer
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
 }

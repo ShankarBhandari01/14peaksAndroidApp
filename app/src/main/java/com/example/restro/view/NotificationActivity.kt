@@ -3,16 +3,23 @@ package com.example.restro.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import com.example.restro.R
+import com.example.restro.data.model.Notification
+import com.example.restro.data.model.NotificationTypes
 import com.example.restro.databinding.ActivityNotificationBinding
+import com.example.restro.databinding.NotificationLayoutBinding
+import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
-import com.example.restro.view.adapters.NotificationAdapter
 import com.example.restro.viewmodel.SocketIOViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -28,31 +35,43 @@ class NotificationActivity : AppCompatActivity() {
         ActivityNotificationBinding.inflate(layoutInflater)
     }
     private val socketIOViewModel: SocketIOViewModel by viewModels()
-    private lateinit var notificationAdapter: NotificationAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
+        val notificationAdapter = BasePagingAdapter(
+            inflate = NotificationLayoutBinding::inflate,
+            bindItem = { binding, item: Notification ->
+                binding.tvTitle.text = item.title
+                binding.tvMessage.text = item.message
+                binding.tvDate.text = item.createdAt
 
-        notificationAdapter = NotificationAdapter()
-        binding.recyclerView.adapter = notificationAdapter.withLoadStateFooter(
-            footer = LoadingStateAdapter { notificationAdapter.retry() }
+                binding.viewIndicator.visibility = if (item.isRead) View.INVISIBLE else View.VISIBLE
+
+            },
+            onItemClick = { notification ->
+                Toast.makeText(this, "Clicked: ${notification.title}", Toast.LENGTH_SHORT).show()
+            },
+            diffCallback = object : DiffUtil.ItemCallback<Notification>() {
+                override fun areItemsTheSame(oldItem: Notification, newItem: Notification) =
+                    oldItem._id == newItem._id
+
+                override fun areContentsTheSame(oldItem: Notification, newItem: Notification) =
+                    oldItem == newItem
+            }
         )
 
         // load notifications
         lifecycleScope.launch {
             socketIOViewModel.notification.collectLatest { pagingData ->
+                binding.recyclerView.adapter = notificationAdapter.withLoadStateFooter(
+                    footer = LoadingStateAdapter { notificationAdapter.retry() }
+                )
                 notificationAdapter.submitData(pagingData)
             }
         }
-
 
     }
 }

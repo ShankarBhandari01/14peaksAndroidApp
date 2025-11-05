@@ -1,5 +1,7 @@
 package com.example.restro.data.model
 
+import java.io.Serializable
+
 data class Sales(
     val _id: String,
     val createdDate: String,
@@ -18,4 +20,4 @@ data class Sales(
     val updated_ts: String,
     val vatAmount: Double,
     val vatPercent: Int
-)
+): Serializable

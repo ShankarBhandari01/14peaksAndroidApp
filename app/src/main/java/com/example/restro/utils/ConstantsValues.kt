@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class Constants {
+class ConstantsValues {
     companion object {
 
         /**
@@ -58,13 +58,16 @@ class Constants {
          * API Lists
          */
         const val LIVE_BASE_URL = "https://api.ravintola14peaks.fi/api/v1/"
-        const val DEV_BASE_URL= "http://10.0.2.2:8080/api/v1/"
+        const val DEV_BASE_URL = "http://10.0.2.2:8080/api/v1/"
         const val WEB_SOCKET_URL = "https://api.ravintola14peaks.fi/"
+
+        const val DEV_WEB_SOCKET_URL = "http://10.0.2.2:8080/"
         const val API_KEY = ""
         const val API_LOGON = "login"
         const val API_GET_All_ORDERS = "AllOrders"
         const val API_REFRESH_TOKEN = "token/refresh"
         const val API_NOTIFICATION = "notification"
+        const val API_GET_ALL_RESERVATION = "getAllReservations"
 
 
         // Structured scope for background work

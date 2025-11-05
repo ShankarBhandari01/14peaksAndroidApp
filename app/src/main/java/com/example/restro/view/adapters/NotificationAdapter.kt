@@ -24,20 +24,20 @@ class NotificationAdapter :
     }
 
     class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val tvName = itemView.findViewById<TextView>(R.id.tvName)
-        private val tvEmail = itemView.findViewById<TextView>(R.id.tvEmail)
+      //  private val tvName = itemView.findViewById<TextView>(R.id.tvName)
+      //  private val tvEmail = itemView.findViewById<TextView>(R.id.tvEmail)
 
-        fun bind(notification: Notification) {
+       /* fun bind(notification: Notification) {
             tvName.text = notification._id
             tvEmail.text = notification.title
-        }
+        }*/
     }
 
     override fun onBindViewHolder(
         holder: NotificationViewHolder,
         position: Int
     ) {
-        getItem(position)?.let { holder.bind(it) }
+      //  getItem(position)?.let { holder.bind(it) }
     }
 
     override fun onCreateViewHolder(

@@ -1,5 +1,6 @@
 package com.example.restro.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.restro.R
 import com.example.restro.databinding.LoginFragmentBinding
 import com.example.restro.data.model.UserResponse
+import com.example.restro.service.SocketForegroundService
 import com.example.restro.utils.UiEvent
 import com.example.restro.utils.Utils
 import com.example.restro.utils.Utils.getGreetingMessage
@@ -105,6 +107,13 @@ class LoginFragment : Fragment() {
                     offlineViewModel.setFirstLaunch(false)
                     // set user session
                     offlineViewModel.saveSession(userResponse.session)
+                    // start background services
+                    val intent =
+                        Intent(activity as MainActivity, SocketForegroundService::class.java).apply {
+                            putExtra("USER_ID", userResponse.user._id)
+                        }
+                    ContextCompat.startForegroundService(activity as MainActivity, intent)
+
                     // navigate to dashboard
                     event.destinationId?.let {
                         findNavController().navigate(
@@ -114,6 +123,7 @@ class LoginFragment : Fragment() {
                                 NavOptions.Builder().setPopUpTo(popId, true).build()
                             }
                         )
+
                     }
                 }
 

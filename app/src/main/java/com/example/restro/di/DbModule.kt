@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.restro.local.OfflineDatabase
 import com.example.restro.data.model.User
-import com.example.restro.utils.Constants.Companion.OFFLINE_DATABASE
+import com.example.restro.utils.ConstantsValues.Companion.OFFLINE_DATABASE
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -18,7 +18,7 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="7dp"
         app:cardUseCompatPadding="true"
-        app:strokeColor="@color/teal_200"
+        app:strokeColor="@color/primaryColor"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{sales.status}"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="@color/teal_200"
+                app:chipBackgroundColor="@color/secondaryColor"
                 app:chipCornerRadius="8dp" />
 
             <!-- Action Buttons -->

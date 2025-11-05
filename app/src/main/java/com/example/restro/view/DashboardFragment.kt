@@ -14,6 +14,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
+import com.example.restro.utils.Utils
+import com.example.restro.utils.Utils.isAppInForeground
+import com.example.restro.utils.Utils.sendNotification
 import com.example.restro.viewmodel.OfflineDatabaseViewModel
 import com.example.restro.viewmodel.SocketIOViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,7 +52,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         offlineDatabaseViewModel.getUser.observe(viewLifecycleOwner) { user ->
             user ?: return@observe
             this.user = user
-            connectSocketIo(user._id!!)
+         //   connectSocketIo(user._id!!)
         }
 
         savedInstanceState?.let {
@@ -84,9 +87,13 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
                 // observe notification changes
                 launch {
                     socketIOViewModel.latestMessage.collect { message ->
-                        if (message != null) {
-                            Timber.d("New socket message: $message")
-                            // TODO: parse message -> update salesList or notify adapter
+                        Timber.d("New socket message: ${message.body}")
+                        if (binding.root.context.isAppInForeground()) {
+                            // App is open → show dialog
+                            Utils.showAlertDialog(binding.root.context, message.title)
+                        } else {
+                            // App in background → send notification
+                            sendNotification(binding.root.context, message.title!!)
                         }
                     }
                 }
@@ -120,6 +127,6 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     override fun onDestroy() {
         super.onDestroy()
-        socketIOViewModel.disconnect()
+        //  socketIOViewModel.disconnect()
     }
 }

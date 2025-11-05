@@ -1,31 +1,32 @@
 package com.example.restro.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.DiffUtil
 import com.example.restro.R
-import com.example.restro.databinding.FragmentSalesOrderBinding
 import com.example.restro.data.model.Sales
-import com.example.restro.data.model.ApiResponse
-import com.example.restro.utils.UiEvent
-import com.example.restro.utils.Utils
-import com.example.restro.view.adapters.SalesOrderAdapter
+import com.example.restro.databinding.FragmentSalesOrderBinding
+import com.example.restro.databinding.SalesListViewBinding
+import com.example.restro.view.adapters.BasePagingAdapter
+import com.example.restro.view.adapters.LoadingStateAdapter
+import com.example.restro.view.adapters.ShimmerAdapter
 import com.example.restro.view.bottom_sheet_dialog.FilterBottomSheet
 import com.example.restro.viewmodel.SalesViewModel
 import com.example.restro.viewmodel.SocketIOViewModel
 import com.google.android.material.chip.Chip
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -39,8 +40,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
     private val activeFilters = mutableListOf<String>()
 
-    private val salesList = mutableListOf<Sales>()
-    private lateinit var adapter: SalesOrderAdapter
+
     private val viewModel by viewModels<SalesViewModel>()
 
     override fun onCreateView(
@@ -55,8 +55,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         refreshRecyclerView()
-        viewModel.loadSalesOrders("desc", 1, 10)
-        observeUiEvents()
+
 
         binding.iconFilterButton.setOnClickListener {
             val bottomSheet = FilterBottomSheet()
@@ -69,28 +68,81 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
             bottomSheet.show(childFragmentManager, "FilterBottomSheet")
         }
 
-        observeSocketIO()
     }
 
     // observe sales order changes
-    private fun observeSocketIO() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun refreshRecyclerView() {
+        val shimmerAdapter = ShimmerAdapter()
+        binding.salesRecyclerView.adapter = shimmerAdapter
 
-                socketIOViewModel.latestMessage.collect { message ->
-                    if (message != null) {
-                        Timber.d("New socket message: $message")
-                        // TODO: parse message -> update salesList or notify adapter
+        val pagingAdapter = BasePagingAdapter(
+            inflate = SalesListViewBinding::inflate,
+            bindItem = { binding, item: Sales ->
+                binding.sales = item
+
+                if (item.status.lowercase() == "accepted" || item.status.lowercase() == "completed") {
+                    binding.llChangeStatus.visibility = ViewGroup.GONE
+                } else {
+                    binding.llChangeStatus.visibility = ViewGroup.VISIBLE
+                }
+
+                binding.orderStatus.setTextColor(
+                    when (item.status.lowercase()) {
+                        "delivered" -> "#388E3C".toColorInt()
+                        "pending" -> "#FBC02D".toColorInt()
+                        "cancelled" -> "#D32F2F".toColorInt()
+                        else -> Color.BLACK
                     }
+                )
+
+                binding.btnAccept.setOnClickListener {
+                    Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
+                }
+                binding.btnReject.setOnClickListener {
+                    Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onItemClick = { sales ->
+                Toast.makeText(context, "Clicked: ${sales.customer.name}", Toast.LENGTH_SHORT)
+                    .show()
+            },
+            diffCallback = object : DiffUtil.ItemCallback<Sales>() {
+                override fun areItemsTheSame(oldItem: Sales, newItem: Sales) =
+                    oldItem._id == newItem._id
+
+                override fun areContentsTheSame(oldItem: Sales, newItem: Sales) =
+                    oldItem == newItem
+            }
+        )
+
+
+        lifecycleScope.launch {
+            viewModel.loadSalesOrders().collectLatest { pagingData ->
+                binding.salesRecyclerView.adapter = pagingAdapter.withLoadStateFooter(
+                    footer = LoadingStateAdapter { pagingAdapter.retry() }
+                )
+                pagingAdapter.submitData(pagingData)
+            }
+        }
+
+
+        pagingAdapter.addLoadStateListener { loadState ->
+            when (loadState.refresh) {
+                is LoadState.Loading -> {
+                    binding.salesRecyclerView.adapter = shimmerAdapter
+                }
+
+                is LoadState.NotLoading -> {
+                    binding.salesRecyclerView.adapter =
+                        pagingAdapter.withLoadStateFooter(footer = LoadingStateAdapter { pagingAdapter.retry() })
+                }
+
+                is LoadState.Error -> {
+                    Toast.makeText(context, "Failed to load data", Toast.LENGTH_SHORT).show()
                 }
             }
         }
-    }
 
-
-    private fun refreshRecyclerView() {
-        adapter = SalesOrderAdapter(salesList)
-        binding.salesRecyclerView.adapter = adapter
     }
 
     private fun showAppliedFilters(filters: List<String>) {
@@ -111,36 +163,11 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     }
 
     private fun observeUiEvents() {
-        viewModel.uiEvents.observe(viewLifecycleOwner) { event ->
-            when (event) {
-                is UiEvent.ShowLoading -> Utils.showProgressDialog(
-                    "Loading the sales orders…",
-                    activity as MainActivity
-                )
-
-                is UiEvent.HideLoading -> Utils.dismissProgressDialog()
-                is UiEvent.ShowMessage -> {
-                    Timber.tag(TAG).e("observeUiEvents: ${event.message} ")
-                    Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                is UiEvent.Navigate -> {
-                    val salesData = event.data as ApiResponse<Sales>
-                    Timber.tag(TAG).e("observeUiEvents: ${Gson().toJson(salesData)} ")
-                    salesList.clear()
-                    salesList.addAll(salesData.data)
-                    adapter.notifyDataSetChanged()
-                }
-
-                is UiEvent.NavigateToActivity -> {}
-            }
-        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        socketIOViewModel.disconnect()
+       // socketIOViewModel.disconnect()
         _binding = null
     }
 }

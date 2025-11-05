@@ -3,9 +3,12 @@ package com.example.restro.utils
 import android.R.drawable.ic_dialog_alert
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
@@ -17,11 +20,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
 import android.net.NetworkCapabilities.TRANSPORT_ETHERNET
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
+import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.Window
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
 import com.example.restro.databinding.DialogProgressBinding
@@ -35,6 +40,42 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object Utils {
+
+    fun Context.isAppInForeground(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val appProcesses = activityManager.runningAppProcesses ?: return false
+        val packageName = packageName
+        return appProcesses.any {
+            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+                    it.processName == packageName
+        }
+    }
+
+
+    fun sendNotification(context: Context, message: String) {
+        val channelId = "socket_channel"
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Create channel if Android >= O
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Socket Messages",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setContentTitle("New Message")
+            .setContentText(message)
+            .setSmallIcon(R.drawable.baseline_notifications_active_24)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+    }
 
     @SuppressLint("HardwareIds")
     suspend fun extractDeviceId(context: Context): String {
@@ -119,7 +160,12 @@ object Utils {
             builder.setPositiveButton("OK") { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
+
             val alertDialog: AlertDialog = builder.create()
+
+            if (alertDialog.isShowing) {
+                alertDialog.dismiss()
+            }
             alertDialog.setCancelable(false)
             alertDialog.show()
         } catch (e: Exception) {
