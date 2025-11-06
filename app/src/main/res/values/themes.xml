@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.RotaPredictionApp" parent="Base.Theme.RotaPredictionApp" />
+
+    <style name="RoundedDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@drawable/bg_notification_popup</item>
+    </style>
 </resources>

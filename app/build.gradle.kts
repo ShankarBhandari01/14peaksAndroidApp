@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.play.services.ads.identifier)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.paging.common)
+    
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

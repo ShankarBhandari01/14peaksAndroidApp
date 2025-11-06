@@ -29,8 +29,10 @@ import android.view.Window
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
+import com.example.restro.databinding.DialogNotificationPopupBinding
 import com.example.restro.databinding.DialogProgressBinding
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -257,7 +259,7 @@ object Utils {
             { _, hourOfDay, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
-                val selectedDateTime = formatDateTime(calendar)
+                val selectedDateTime = context.formatDateTime(calendar)
                 onDateTimeSelected(selectedDateTime)
             },
             calendar.get(Calendar.HOUR_OF_DAY),
@@ -267,17 +269,42 @@ object Utils {
         timePickerDialog.show()
     }
 
-    fun formatDateTime(calendar: Calendar = Calendar.getInstance()): String {
+    fun Context.formatDateTime(calendar: Calendar = Calendar.getInstance()): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault())
         return dateFormat.format(calendar.time)
     }
 
 
-    fun formatDuration(durationMillis: Long): String {
+    fun Context.formatDuration(durationMillis: Long): String {
         val hours = TimeUnit.MILLISECONDS.toHours(durationMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) % 60
         val seconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis) % 60
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
+
+    //
+    fun Context.showNotificationPopup(
+        title: String,
+        message: String,
+        onViewClick: (() -> Unit)? = null
+    ) {
+        val dialogView = DialogNotificationPopupBinding.inflate(LayoutInflater.from(this))
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView.root)
+            .create()
+
+        dialogView.tvNotificationTitle.text = title
+        dialogView.tvNotificationMessage.text = message
+
+        dialogView.btnClose.setOnClickListener { dialog.dismiss() }
+        dialogView.btnView.setOnClickListener {
+            dialog.dismiss()
+            onViewClick?.invoke()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
 
 }

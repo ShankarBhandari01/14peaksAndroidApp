@@ -8,19 +8,14 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
-import com.example.restro.R
 import com.example.restro.data.model.Notification
-import com.example.restro.data.model.NotificationTypes
 import com.example.restro.databinding.ActivityNotificationBinding
 import com.example.restro.databinding.NotificationLayoutBinding
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
-import com.example.restro.viewmodel.SocketIOViewModel
+import com.example.restro.viewmodel.NotificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -34,7 +29,7 @@ class NotificationActivity : AppCompatActivity() {
     val binding by lazy {
         ActivityNotificationBinding.inflate(layoutInflater)
     }
-    private val socketIOViewModel: SocketIOViewModel by viewModels()
+    private val notificationViewModel: NotificationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +60,7 @@ class NotificationActivity : AppCompatActivity() {
 
         // load notifications
         lifecycleScope.launch {
-            socketIOViewModel.notification.collectLatest { pagingData ->
+            notificationViewModel.notification.collectLatest { pagingData ->
                 binding.recyclerView.adapter = notificationAdapter.withLoadStateFooter(
                     footer = LoadingStateAdapter { notificationAdapter.retry() }
                 )

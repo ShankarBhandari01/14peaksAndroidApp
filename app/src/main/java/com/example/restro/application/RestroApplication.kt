@@ -1,6 +1,8 @@
 package com.example.restro.application
 
+import android.app.Activity
 import android.app.Application
+import android.os.Bundle
 import androidx.startup.AppInitializer
 import cat.ereza.customactivityoncrash.activity.DefaultErrorActivity
 import cat.ereza.customactivityoncrash.config.CaocConfig
@@ -27,6 +29,8 @@ class RestroApplication : Application() {
             deviceInfo.platform = "android"
             deviceInfo.deviceId = Utils.extractDeviceId(this@RestroApplication)
         }
+
+        registerActivityLifecycleCallbacks(AppLifecycleTracker)
     }
 
 
@@ -47,5 +51,34 @@ class RestroApplication : Application() {
             .errorActivity(DefaultErrorActivity::class.java)
             .apply()
     }
+
+
+}
+
+object AppLifecycleTracker : Application.ActivityLifecycleCallbacks {
+    var isAppInForeground = false
+        private set
+
+    private var activityReferences = 0
+    private var isActivityChangingConfigurations = false
+
+    override fun onActivityPaused(activity: Activity) {}
+    override fun onActivityStarted(activity: Activity) {
+        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
+            isAppInForeground = true
+        }
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        isActivityChangingConfigurations = activity.isChangingConfigurations
+        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
+            isAppInForeground = false
+        }
+    }
+
+    override fun onActivityCreated(a: Activity, b: Bundle?) {}
+    override fun onActivityResumed(a: Activity) {}
+    override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
+    override fun onActivityDestroyed(a: Activity) {}
 
 }

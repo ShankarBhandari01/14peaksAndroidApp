@@ -16,16 +16,16 @@ class ApisServicesImpl @Inject constructor(private val apiService: ApiService) {
         sort: String,
         page: Int,
         limit: Int
-    ) = apiService.getAllOrders(sort, page, limit)
+    ) = apiService.getAllOrders(sort, page = page, limit = limit)
 
     suspend fun getNotifications(
         page: Int,
         limit: Int
-    ) = apiService.getNotifications(page, limit)
+    ) = apiService.getNotifications(page = page, limit = limit)
 
 
     suspend fun getAllReservation(
         page: Int,
         limit: Int
-    ) = apiService.getAllReservation(page, limit)
+    ) = apiService.getAllReservation(page = page, limit = limit)
 }

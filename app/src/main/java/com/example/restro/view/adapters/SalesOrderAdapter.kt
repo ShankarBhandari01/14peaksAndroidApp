@@ -12,7 +12,7 @@ import androidx.core.graphics.toColorInt
 class SalesOrderAdapter(private val sales: List<Sales>) :
     RecyclerView.Adapter<SalesOrderAdapter.SalesViewHolder>() {
 
-    inner class SalesViewHolder(val binding: SalesListViewBinding) :
+     class SalesViewHolder(val binding: SalesListViewBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SalesViewHolder =

@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DiffUtil
 import com.example.restro.R
+import com.example.restro.data.model.FilterOption
 import com.example.restro.data.model.Sales
 import com.example.restro.databinding.FragmentSalesOrderBinding
 import com.example.restro.databinding.SalesListViewBinding
@@ -22,7 +22,6 @@ import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.view.adapters.ShimmerAdapter
 import com.example.restro.view.bottom_sheet_dialog.FilterBottomSheet
 import com.example.restro.viewmodel.SalesViewModel
-import com.example.restro.viewmodel.SocketIOViewModel
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -35,10 +34,8 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     private var _binding: FragmentSalesOrderBinding? = null
     private val binding get() = _binding!!
 
-    // shared across multiple fragments
-    private val socketIOViewModel: SocketIOViewModel by activityViewModels()
 
-    private val activeFilters = mutableListOf<String>()
+    private val activeFilters = mutableListOf<FilterOption>()
 
 
     private val viewModel by viewModels<SalesViewModel>()
@@ -54,20 +51,29 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        refreshRecyclerView()
 
+        refreshRecyclerView()
+        setupFilterBottomSheet()
+
+        viewModel.loadSalesOrders()
+
+
+    }
+
+    private fun setupFilterBottomSheet() {
+        val bottomSheet = FilterBottomSheet()
 
         binding.iconFilterButton.setOnClickListener {
-            val bottomSheet = FilterBottomSheet()
+
             bottomSheet.onFiltersApplied = { selectedFilters ->
                 activeFilters.clear()
                 activeFilters.addAll(selectedFilters)
+
                 showAppliedFilters(activeFilters)
-                refreshRecyclerView()
+                viewModel.loadSalesOrders(sort = "asc")
             }
             bottomSheet.show(childFragmentManager, "FilterBottomSheet")
         }
-
     }
 
     // observe sales order changes
@@ -117,7 +123,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
 
         lifecycleScope.launch {
-            viewModel.loadSalesOrders().collectLatest { pagingData ->
+            viewModel.salesPagingData.collectLatest { pagingData ->
                 binding.salesRecyclerView.adapter = pagingAdapter.withLoadStateFooter(
                     footer = LoadingStateAdapter { pagingAdapter.retry() }
                 )
@@ -145,29 +151,25 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
     }
 
-    private fun showAppliedFilters(filters: List<String>) {
+    private fun showAppliedFilters(filters: List<FilterOption>) {
         binding.appliedFiltersChipGroup.removeAllViews()
 
         filters.forEach { filter ->
             val chip = Chip(requireContext()).apply {
-                text = filter
+                text = filter.name
                 isCloseIconVisible = true
                 setOnCloseIconClickListener {
                     binding.appliedFiltersChipGroup.removeView(this)
                     activeFilters.remove(filter)
-                    refreshRecyclerView()
                 }
             }
             binding.appliedFiltersChipGroup.addView(chip)
         }
     }
 
-    private fun observeUiEvents() {
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
-       // socketIOViewModel.disconnect()
         _binding = null
     }
 }

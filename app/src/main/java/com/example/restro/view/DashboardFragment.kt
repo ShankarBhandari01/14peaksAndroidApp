@@ -6,22 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
-import com.example.restro.utils.Utils
-import com.example.restro.utils.Utils.isAppInForeground
-import com.example.restro.utils.Utils.sendNotification
 import com.example.restro.viewmodel.OfflineDatabaseViewModel
-import com.example.restro.viewmodel.SocketIOViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
@@ -33,7 +24,6 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     // shared across multiple fragments
     private val offlineDatabaseViewModel by activityViewModels<OfflineDatabaseViewModel>()
-    private val socketIOViewModel: SocketIOViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -52,7 +42,6 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         offlineDatabaseViewModel.getUser.observe(viewLifecycleOwner) { user ->
             user ?: return@observe
             this.user = user
-         //   connectSocketIo(user._id!!)
         }
 
         savedInstanceState?.let {
@@ -66,41 +55,6 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         }
     }
 
-    private fun connectSocketIo(userId: String) {
-        // Connect Socket
-        socketIOViewModel.connect(userId)
-
-        // Observe notification messages
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                launch {
-                    socketIOViewModel.isConnected.collect { connected ->
-                        if (connected) {
-                            Timber.d(" Socket connected")
-                        } else {
-                            Timber.d(" Socket disconnected")
-                        }
-                    }
-                }
-
-                // observe notification changes
-                launch {
-                    socketIOViewModel.latestMessage.collect { message ->
-                        Timber.d("New socket message: ${message.body}")
-                        if (binding.root.context.isAppInForeground()) {
-                            // App is open → show dialog
-                            Utils.showAlertDialog(binding.root.context, message.title)
-                        } else {
-                            // App in background → send notification
-                            sendNotification(binding.root.context, message.title!!)
-                        }
-                    }
-                }
-
-            }
-        }
-    }
 
     private fun setBottomNavigation() {
         val navHostFragment =
@@ -123,10 +77,5 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        //  socketIOViewModel.disconnect()
     }
 }

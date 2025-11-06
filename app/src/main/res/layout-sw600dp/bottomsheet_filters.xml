@@ -1,54 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/colorSurface"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Header -->
     <TextView
-        android:id="@+id/filterTitle"
+        android:id="@+id/tvFilterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"
-        android:text="Filters"
+        android:text="Available Filters"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:textStyle="bold" />
 
-    <!-- Example Filters -->
-    <CheckBox
-        android:id="@+id/filterStatusPending"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Status: Pending" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFilters"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        tools:listitem="@layout/item_filter_option" />
 
-    <CheckBox
-        android:id="@+id/filterStatusDelivered"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Status: Delivered" />
-
-    <CheckBox
-        android:id="@+id/filterLast7Days"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date: Last 7 Days" />
-
-    <CheckBox
-        android:id="@+id/filterLast30Days"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date: Last 30 Days" />
-
-    <!-- Apply Button -->
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/applyFiltersButton"
-        style="@style/Widget.MaterialComponents.Button"
+        android:id="@+id/btnApplyFilters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:textColor="@color/white"
         android:backgroundTint="@color/black"
         android:text="Apply Filters"
         app:cornerRadius="12dp" />

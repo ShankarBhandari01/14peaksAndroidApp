@@ -21,5 +21,5 @@ class ShimmerAdapter : RecyclerView.Adapter<ShimmerAdapter.ShimmerViewHolder>() 
 
     override fun getItemCount(): Int = 6
 
-    inner class ShimmerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class ShimmerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

@@ -13,6 +13,9 @@ import com.example.restro.repos.SalesRepository
 import com.example.restro.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,9 +27,17 @@ class SalesViewModel @Inject constructor(
 
     private val _uiEvents = MutableLiveData<UiEvent>()
     val uiEvents: LiveData<UiEvent> = _uiEvents
+    private val _salesPagingData = MutableSharedFlow<PagingData<Sales>>(replay = 1)
+    val salesPagingData:  Flow<PagingData<Sales>> = _salesPagingData
 
-    fun loadSalesOrders(sortBy: String = "desc"): Flow<PagingData<Sales>> {
-        return repository.getSalesOrdersPaging(sortBy).cachedIn(viewModelScope)
+    fun loadSalesOrders(sort: String = "desc") {
+        viewModelScope.launch {
+            repository.getSalesOrdersPaging(sort)
+                .cachedIn(viewModelScope)
+                .collectLatest { pagingData ->
+                    _salesPagingData.emit(pagingData)
+                }
+        }
     }
 
     fun loadReservations(): Flow<PagingData<Reservation>> {

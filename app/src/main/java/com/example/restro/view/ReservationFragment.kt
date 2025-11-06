@@ -14,8 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DiffUtil
 import com.example.restro.R
+import com.example.restro.data.model.FilterOption
 import com.example.restro.data.model.Reservation
-import com.example.restro.data.model.Sales
 import com.example.restro.databinding.FragmentReservationBinding
 import com.example.restro.databinding.ReservationItemBinding
 import com.example.restro.view.adapters.BasePagingAdapter
@@ -23,10 +23,9 @@ import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.view.adapters.ShimmerAdapter
 import com.example.restro.view.bottom_sheet_dialog.FilterBottomSheet
 import com.example.restro.viewmodel.SalesViewModel
-import com.example.restro.viewmodel.SocketIOViewModel
+import com.example.restro.viewmodel.NotificationViewModel
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.getValue
@@ -38,8 +37,7 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
     private val binding get() = _binding!!
     // shared across multiple fragments
 
-    private val activeFilters = mutableListOf<String>()
-    private val socketIOViewModel: SocketIOViewModel by activityViewModels()
+    private val activeFilters = mutableListOf<FilterOption>()
 
     private val viewModel by viewModels<SalesViewModel>()
 
@@ -128,9 +126,8 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
             }
         }
 
-
+        val bottomSheet = FilterBottomSheet()
         binding.iconFilterButton.setOnClickListener {
-            val bottomSheet = FilterBottomSheet()
             bottomSheet.onFiltersApplied = { selectedFilters ->
                 activeFilters.clear()
                 activeFilters.addAll(selectedFilters)
@@ -143,12 +140,12 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
     }
 
 
-    private fun showAppliedFilters(filters: List<String>) {
+    private fun showAppliedFilters(filters: List<FilterOption>) {
         binding.appliedFiltersChipGroup.removeAllViews()
 
         filters.forEach { filter ->
             val chip = Chip(requireContext()).apply {
-                text = filter
+                text = filter.name
                 isCloseIconVisible = true
                 setOnCloseIconClickListener {
                     binding.appliedFiltersChipGroup.removeView(this)

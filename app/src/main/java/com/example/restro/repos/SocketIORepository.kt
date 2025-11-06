@@ -103,6 +103,7 @@ class SocketIORepository @Inject constructor(
                     supervisedScope.launch {
                         val raw = args.firstOrNull()?.toString() ?: return@launch
                         runCatching {
+                            Timber.d(raw)
 
                             val notification = gson.fromJson(raw, SocketNotification::class.java)
                             _messages.emit(notification)
