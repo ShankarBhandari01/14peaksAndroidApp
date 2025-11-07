@@ -7,12 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.restro.databinding.SalesListViewBinding
 import com.example.restro.data.model.Sales
 import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.LinearLayoutManager
 
 
 class SalesOrderAdapter(private val sales: List<Sales>) :
     RecyclerView.Adapter<SalesOrderAdapter.SalesViewHolder>() {
 
-     class SalesViewHolder(val binding: SalesListViewBinding) :
+    class SalesViewHolder(val binding: SalesListViewBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SalesViewHolder =

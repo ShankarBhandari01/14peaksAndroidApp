@@ -6,7 +6,7 @@ data class Sales(
     val _id: String,
     val createdDate: String,
     val customer: Customer,
-    val items: List<Item>,
+    val items: List<OrderItems>,
     val itemsData: List<ItemsData>,
     val orderId: String,
     val orderQuantity: Int,

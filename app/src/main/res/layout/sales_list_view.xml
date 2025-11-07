@@ -1,5 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -11,20 +12,21 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="6dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:cardCornerRadius="16dp"
         app:cardElevation="7dp"
         app:cardUseCompatPadding="true"
-        app:strokeColor="@color/primaryColor"
+        app:strokeColor="@color/surfaceColor"
         app:strokeWidth="1dp">
 
         <LinearLayout
-            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -37,7 +39,16 @@
                 android:text="@{`Order: ` + sales.orderId}"
                 android:textStyle="bold" />
 
-            <!-- Customer -->
+            <!-- Customer ID-->
+            <TextView
+                android:id="@+id/customerId"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{`Customer Id: ` + sales.customer.customerId}" />
+
+            <!-- Customer-->
             <TextView
                 android:id="@+id/customerName"
                 style="@style/TextAppearance.MaterialComponents.Body2"
@@ -46,34 +57,171 @@
                 android:layout_marginTop="4dp"
                 android:text="@{`Customer: ` + sales.customer.name}" />
 
-            <!-- Date & Amount Row -->
+            <!-- Email -->
+            <TextView
+                android:id="@+id/tv_email"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Email: ` + sales.customer.email}" />
+
+            <!-- phone -->
+            <TextView
+                android:id="@+id/tv_phone"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Phone: ` + sales.customer.phone}" />
+
+            <!-- address -->
+            <TextView
+                android:id="@+id/tv_address"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Address: ` + sales.customer.address}" />
+
+            <TextView
+                android:id="@+id/orderDate"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:formattedDate="@{sales.createdDate}" />
+
+            <!-- Orders items -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:padding="@dimen/_5sdp"
-                android:weightSum="2">
+                android:layout_marginTop="@dimen/_8sdp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/orderDate"
-                    style="@style/TextAppearance.MaterialComponents.Caption"
-                    android:layout_width="0dp"
+                    android:id="@+id/orderItemsDetails"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="@dimen/_4sdp"
-                    android:text="@{`Date: ` + sales.updated_ts}" />
-
-                <TextView
-                    android:id="@+id/orderAmount"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:text="@{`Total: $` + sales.totalAmount}"
+                    android:text="Order Items Details"
                     android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_sales_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    tools:listitem="@layout/item_sales_item" />
+
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_amount_calculation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_amount_summary"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <!-- Subtotal Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sub Total:" />
+
+                    <TextView
+                        android:id="@+id/subtotal"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.subtotal}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- VAT % Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="VAT:" />
+
+                    <TextView
+                        android:id="@+id/vatPercent"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{sales.vatPercent + `%`}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- VAT Amount Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="VAT Amount:" />
+
+                    <TextView
+                        android:id="@+id/vatAmount"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.vatAmount}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Total Row (Highlighted) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total:"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/orderAmount"
+                        style="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.totalAmount}"
+                        android:textColor="@color/gray"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <!-- Order Status as Chip -->
             <com.google.android.material.chip.Chip
@@ -83,7 +231,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{sales.status}"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="@color/secondaryColor"
+                app:chipBackgroundColor="@color/secondaryVariant"
                 app:chipCornerRadius="8dp" />
 
             <!-- Action Buttons -->

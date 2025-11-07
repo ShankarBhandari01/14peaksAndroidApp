@@ -1,6 +1,6 @@
 package com.example.restro.data.model
 
-data class Item(
+data class OrderItems(
     val item: String,
     val name: Name,
     val pricePerItem: Double,

@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="16dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -59,7 +58,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:layout_marginBottom="@dimen/_12ssp"
         android:scrollbars="vertical"
         app:spanCount="2"
         tools:listitem="@layout/sales_list_view"

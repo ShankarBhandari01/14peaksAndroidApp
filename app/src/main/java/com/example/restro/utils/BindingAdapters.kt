@@ -1,9 +1,15 @@
 package com.example.restro.utils
 
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.databinding.BindingAdapter
 import com.google.android.material.textfield.TextInputEditText
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @BindingAdapter("afterTextChanged")
 fun setAfterTextChangedListener(
@@ -19,3 +25,15 @@ fun setAfterTextChangedListener(
     })
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+@BindingAdapter("formattedDate")
+fun TextView.setFormattedDate(isoDate: String?) {
+    isoDate?.let {
+        val zonedDateTime = ZonedDateTime.parse(it)
+        val dateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
+        val dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH)
+        text =
+            "Order Date: ${zonedDateTime.format(dateFormatter)} (${zonedDateTime.format(dayFormatter)})"
+    }
+}
