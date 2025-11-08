@@ -34,6 +34,6 @@ fun TextView.setFormattedDate(isoDate: String?) {
         val dateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH)
         val dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH)
         text =
-            "Order Date: ${zonedDateTime.format(dateFormatter)} (${zonedDateTime.format(dayFormatter)})"
+            "${zonedDateTime.format(dateFormatter)} (${zonedDateTime.format(dayFormatter)})"
     }
 }

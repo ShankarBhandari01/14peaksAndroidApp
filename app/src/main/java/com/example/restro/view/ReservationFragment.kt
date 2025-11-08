@@ -18,6 +18,7 @@ import com.example.restro.data.model.FilterOption
 import com.example.restro.data.model.Reservation
 import com.example.restro.databinding.FragmentReservationBinding
 import com.example.restro.databinding.ReservationItemBinding
+import com.example.restro.utils.setFormattedDate
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.view.adapters.ShimmerAdapter
@@ -28,14 +29,15 @@ import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.Timer
 import kotlin.getValue
 
 @AndroidEntryPoint
 class ReservationFragment : Fragment(R.layout.fragment_reservation) {
-
+    private val TAG = "ReservationFragment"
     private var _binding: FragmentReservationBinding? = null
     private val binding get() = _binding!!
-    // shared across multiple fragments
 
     private val activeFilters = mutableListOf<FilterOption>()
 
@@ -53,21 +55,47 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpBottomSheetView()
+        setUpRecyclerViewPagingData()
+
+        viewModel.loadReservations()
+    }
+
+    private fun setUpBottomSheetView() {
+        val bottomSheet = FilterBottomSheet()
+
+        binding.iconFilterButton.setOnClickListener {
+            if (bottomSheet.isVisible) {
+                bottomSheet.dismiss()
+            }
+
+            bottomSheet.onFiltersApplied = { selectedFilters ->
+                activeFilters.clear()
+                activeFilters.addAll(selectedFilters)
+                showAppliedFilters(activeFilters)
+            }
+            bottomSheet.show(childFragmentManager, "FilterBottomSheet")
+        }
+    }
+
+    private fun setUpRecyclerViewPagingData() {
         val shimmerAdapter = ShimmerAdapter()
         binding.reservationRecyclerView.adapter = shimmerAdapter
-
 
         val reservationAdapter = BasePagingAdapter(
             inflate = ReservationItemBinding::inflate,
             bindItem = { binding, reservation: Reservation ->
-                binding.tvCustomerName.text = reservation.customer_name
-                binding.tvReservationCode.text = "Code: ${reservation.reservation_code}"
-                binding.tvReservationDate.text = reservation.reservation_date
-                binding.tvPhone.text = "📞 ${reservation.phone_number}"
-                binding.tvGuests.text = "👥 ${reservation.number_of_guests} guests"
-                binding.tvSpecialRequests.text =
-                    reservation.special_requests.ifEmpty { "No special requests" }
-                binding.tvCreatedDate.text = "Created: ${reservation.createdDate}"
+                with(binding) {
+                    tvCustomerName.text = reservation.customer_name
+                    tvReservationCode.text = "Code: ${reservation.reservation_code}"
+                    tvReservationDate.setFormattedDate(reservation.reservation_date)
+                    tvPhone.text = "📞 ${reservation.phone_number}"
+                    tvGuests.text = "👥 ${reservation.number_of_guests} guests"
+                    tvSpecialRequests.text =
+                        reservation.special_requests.ifEmpty { "No special requests" }
+                    tvCreatedDate.text = "Created: ${reservation.createdDate}"
+                }
+
 
                 // Color status badge
                 val statusColor = when (reservation.status.lowercase()) {
@@ -98,7 +126,7 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
 
         lifecycleScope.launch {
-            viewModel.loadReservations().collectLatest { pagingData ->
+            viewModel.reservationData.collectLatest { pagingData ->
                 binding.reservationRecyclerView.adapter = reservationAdapter.withLoadStateFooter(
                     footer = LoadingStateAdapter { reservationAdapter.retry() }
                 )
@@ -125,20 +153,7 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
                 }
             }
         }
-
-        val bottomSheet = FilterBottomSheet()
-        binding.iconFilterButton.setOnClickListener {
-            bottomSheet.onFiltersApplied = { selectedFilters ->
-                activeFilters.clear()
-                activeFilters.addAll(selectedFilters)
-                showAppliedFilters(activeFilters)
-            }
-            bottomSheet.show(childFragmentManager, "FilterBottomSheet")
-        }
-
-
     }
-
 
     private fun showAppliedFilters(filters: List<FilterOption>) {
         binding.appliedFiltersChipGroup.removeAllViews()
@@ -158,7 +173,7 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-      //  socketIOViewModel.disconnect()
+        //  socketIOViewModel.disconnect()
         _binding = null
     }
 }

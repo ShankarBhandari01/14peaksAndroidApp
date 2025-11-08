@@ -28,7 +28,11 @@ class SalesViewModel @Inject constructor(
     private val _uiEvents = MutableLiveData<UiEvent>()
     val uiEvents: LiveData<UiEvent> = _uiEvents
     private val _salesPagingData = MutableSharedFlow<PagingData<Sales>>(replay = 1)
-    val salesPagingData:  Flow<PagingData<Sales>> = _salesPagingData
+    val salesPagingData: Flow<PagingData<Sales>> = _salesPagingData
+
+    private val _reservationData = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
+
+    val reservationData: Flow<PagingData<Reservation>> = _reservationData
 
     fun loadSalesOrders(sort: String = "desc") {
         viewModelScope.launch {
@@ -40,8 +44,16 @@ class SalesViewModel @Inject constructor(
         }
     }
 
-    fun loadReservations(): Flow<PagingData<Reservation>> {
-        return repository.getAllReservation().cachedIn(viewModelScope)
+    fun loadReservations() {
+        viewModelScope.launch {
+            repository.getAllReservation()
+                .cachedIn(viewModelScope)
+                .collectLatest { pagingData ->
+                    _reservationData.emit(pagingData)
+                }
+        }
     }
+
+
 
 }

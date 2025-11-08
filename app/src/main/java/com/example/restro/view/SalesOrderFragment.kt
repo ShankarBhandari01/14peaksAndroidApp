@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.filter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -141,6 +142,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                 binding.salesRecyclerView.adapter = pagingAdapter.withLoadStateFooter(
                     footer = LoadingStateAdapter { pagingAdapter.retry() }
                 )
+
                 pagingAdapter.submitData(pagingData)
             }
         }
