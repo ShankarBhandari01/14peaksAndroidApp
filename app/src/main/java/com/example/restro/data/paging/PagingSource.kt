@@ -26,11 +26,11 @@ class PagingSource<T : Any>(
             val response = fetchData(page, limit)
 
             val pagination = response.pagination
-            val notification = response.data
+            val payload = response.data
             val nextKey = if (page < pagination.totalPages) page + 1 else null
 
             LoadResult.Page(
-                data = notification,
+                data = payload,
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = nextKey
             )

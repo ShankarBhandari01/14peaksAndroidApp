@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.restro.repositories.SalesRepository
+import com.example.restro.repositories.RoomRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -14,7 +14,7 @@ import timber.log.Timber
 class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val salesRepository: SalesRepository,
+    private val salesRepository: RoomRepository,
 ) : CoroutineWorker(context, workerParams) {
     val TAG = "SyncWorker"
 

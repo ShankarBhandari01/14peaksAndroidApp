@@ -2,15 +2,8 @@ package com.example.restro.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.restro.data.model.Sales
 import com.example.restro.data.model.User
 import com.example.restro.local.OfflineDatabase
-import com.example.restro.local.SaleDao
-import com.example.restro.local.UserDao
-import com.example.restro.repositories.Impl.SalesRepositoryImpl
-import com.example.restro.repositories.Impl.UserRepositoryImpl
-import com.example.restro.repositories.SalesRepository
-import com.example.restro.repositories.UserRepository
 import com.example.restro.utils.ConstantsValues.Companion.OFFLINE_DATABASE
 import dagger.Module
 import dagger.Provides
@@ -39,7 +32,7 @@ object DbModule {
 
     @Provides
     @Singleton
-    fun providesSaleDao(db: OfflineDatabase) = db.saleDao()
+    fun providesSaleDao(db: OfflineDatabase) = db.saleReservationDao()
 
 
 

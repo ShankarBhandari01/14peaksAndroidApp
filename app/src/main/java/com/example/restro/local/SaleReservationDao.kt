@@ -1,23 +1,24 @@
 package com.example.restro.local
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.example.restro.data.model.Customer
 import com.example.restro.data.model.ItemsData
 import com.example.restro.data.model.OrderItems
+import com.example.restro.data.model.Reservation
 import com.example.restro.data.model.Sales
 import com.example.restro.data.model.SalesWithDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SaleDao {
+interface SaleReservationDao {
 
-    // ------------------- QUERY -------------------
+    // ------------------- Sales QUERY -------------------
     @Transaction
     @Query("SELECT * FROM sales_table")
     fun getSalesWithDetails(): Flow<List<SalesWithDetails>>
@@ -26,17 +27,29 @@ interface SaleDao {
     @Query("SELECT * FROM sales_table WHERE roomSalesId = :salesId")
     suspend fun getSalesById(salesId: Int): SalesWithDetails?
 
+    @Transaction
+    @Query("SELECT * FROM sales_table ORDER BY createdDate DESC")
+    fun getSalesPaging(): PagingSource<Int, Sales>
+
+
+    @Transaction
+    @Query("SELECT * FROM reservation_table ORDER BY createdDate DESC")
+    fun getReservationPaging(): PagingSource<Int, Reservation>
+
     // ------------------- INSERT -------------------
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertCustomer(customer: Customer)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertSales(sales: Sales): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
+    fun insertSales(sales: List<Sales>)
+
+    @Upsert
     suspend fun insertOrderItems(items: List<OrderItems>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertItemsData(data: List<ItemsData>)
 
     @Transaction
@@ -47,6 +60,56 @@ interface SaleDao {
         insertOrderItems(salesWithDetails.items.map { it.copy(salesId = salesWithDetails.sales._id) })
         insertItemsData(salesWithDetails.itemsData.map { it.copy(salesId = salesWithDetails.sales._id) })
     }
+
+
+    @Transaction
+    suspend fun insertSalesList(salesList: List<Sales>) {
+
+        //  Insert ALL customers first
+        salesList.forEach { sales ->
+            sales.customer?.let { customer ->
+                insertCustomer(customer)
+            }
+        }
+
+        // Insert Sales with FK (customerId)
+        salesList.forEach { sales ->
+            val updatedSales = sales.copy(customerId = sales.customer!!._id)
+            insertSales(updatedSales)
+        }
+
+        // Insert ALL OrderItems with FK
+        val allOrderItems = salesList
+            .flatMap { sales ->
+                sales.items?.map { item ->
+                    item.copy(salesId = sales._id)
+                } ?: emptyList()
+            }
+
+        insertOrderItems(allOrderItems)
+
+        //  Insert ALL ItemsData with FK
+        val allItemsData = salesList
+            .flatMap { sales ->
+                sales.itemsData?.map { itemData ->
+                    itemData.copy(salesId = sales._id)
+                } ?: emptyList()
+            }
+
+        insertItemsData(allItemsData)
+    }
+
+
+    // ------------------- RESERVATION QUERY -------------------
+
+    @Upsert
+    suspend fun upsertReservation(reservation: Reservation)
+
+    @Query("Delete from reservation_table")
+    suspend fun clearReservation()
+
+    @Upsert
+    suspend fun upsertReservation(reservation: List<Reservation>)
 
     // ------------------- DELETE -------------------
     @Delete

@@ -7,7 +7,7 @@ import com.example.restro.data.model.SalesWithDetails
 import com.example.restro.data.model.SocketNotification
 import kotlinx.coroutines.flow.Flow
 
-interface SalesRepository {
+interface RoomRepository {
     fun getSalesOrdersPaging(
         sort: String = "desc",
         limit: Int = 10
@@ -17,7 +17,9 @@ interface SalesRepository {
         limit: Int = 10
     ): Flow<PagingData<Reservation>>
 
-    suspend fun syncData(data: String, notification: SocketNotification<Any>)
+    suspend fun syncDataSalesReservation(data: String, notification: SocketNotification<Any>)
+    suspend fun insertSales(sales: List<Sales>)
 
     suspend fun getLocalData(): Flow<List<SalesWithDetails>>
+
 }

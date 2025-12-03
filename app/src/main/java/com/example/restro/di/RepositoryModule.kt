@@ -4,14 +4,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.example.restro.service.ApiService
 import com.example.restro.di.intercepter.NetworkHelper
-import com.example.restro.local.SaleDao
+import com.example.restro.local.OfflineDatabase
 import com.example.restro.local.UserDao
 import com.example.restro.repositories.Impl.LoginRepositoryImpl
-import com.example.restro.repositories.Impl.SalesRepositoryImpl
+import com.example.restro.repositories.Impl.RoomRepositoryImpl
 import com.example.restro.service.impl.SocketIOServiceImpl
 import com.example.restro.repositories.Impl.UserRepositoryImpl
 import com.example.restro.repositories.LoginRepository
-import com.example.restro.repositories.SalesRepository
+import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.SocketIOService
 import com.example.restro.repositories.UserRepository
 import dagger.Module
@@ -37,10 +37,10 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideSalesRepository(
-        salesDao: SaleDao,
+        db: OfflineDatabase,
         apiService: ApiService,
-    ): SalesRepository {
-        return SalesRepositoryImpl(apiService, salesDao)
+    ): RoomRepository {
+        return RoomRepositoryImpl(apiService, db)
     }
 
     @Provides
@@ -57,7 +57,7 @@ object RepositoryModule {
     fun providesNotificationRepository(
         apiService: ApiService,
         networkHelper: NetworkHelper,
-        salesRepository: SalesRepository
+        salesRepository: RoomRepository
     ): SocketIOService {
         return SocketIOServiceImpl(apiService, networkHelper, salesRepository)
     }

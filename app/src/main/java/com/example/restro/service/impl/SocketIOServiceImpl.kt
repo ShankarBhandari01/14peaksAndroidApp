@@ -9,7 +9,7 @@ import com.example.restro.data.model.Notification
 import com.example.restro.data.model.SocketNotification
 import com.example.restro.data.paging.PagingSource
 import com.example.restro.di.intercepter.NetworkHelper
-import com.example.restro.repositories.SalesRepository
+import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.ApiService
 import com.example.restro.service.SocketIOService
 import com.example.restro.utils.ConstantsValues
@@ -33,7 +33,7 @@ import javax.inject.Singleton
 class SocketIOServiceImpl @Inject constructor(
     private val apiService: ApiService,
     private val networkHelper: NetworkHelper,
-    private val salesRepository: SalesRepository
+    private val roomRepository: RoomRepository
 ) : SocketIOService, BaseRepository() {
 
     private var socket: Socket? = null
@@ -118,7 +118,7 @@ class SocketIOServiceImpl @Inject constructor(
                             val notification: SocketNotification<Any> =
                                 raw.to<SocketNotification<Any>>()
 
-                            salesRepository.syncData(raw, notification)
+                            roomRepository.syncDataSalesReservation(raw, notification)
 
                             _messages.emit(notification)
 
