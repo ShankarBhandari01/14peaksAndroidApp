@@ -9,13 +9,16 @@ import androidx.paging.cachedIn
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.Reservation
 import com.example.restro.data.model.Sales
-import com.example.restro.repos.SalesRepository
+import com.example.restro.repositories.Impl.SalesRepositoryImpl
+import com.example.restro.repositories.SalesRepository
 import com.example.restro.utils.UiEvent
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +44,14 @@ class SalesViewModel @Inject constructor(
                 .collectLatest { pagingData ->
                     _salesPagingData.emit(pagingData)
                 }
+
+
+            repository.getLocalData().collectLatest { data ->
+                Timber.tag("local").d(Gson().toJson(data))
+            }
         }
+
+
     }
 
     fun loadReservations() {
@@ -53,7 +63,6 @@ class SalesViewModel @Inject constructor(
                 }
         }
     }
-
 
 
 }

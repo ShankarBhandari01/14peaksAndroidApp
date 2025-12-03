@@ -26,7 +26,7 @@ fun setAfterTextChangedListener(
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @BindingAdapter("formattedDate")
 fun TextView.setFormattedDate(isoDate: String?) {
     isoDate?.let {

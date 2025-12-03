@@ -14,11 +14,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.restro.R
 import com.example.restro.application.AppLifecycleTracker
 import com.example.restro.data.model.SocketNotification
-import com.example.restro.repos.SocketIORepository
-import com.example.restro.utils.Utils
+import com.example.restro.service.SocketIOService
 import com.example.restro.view.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +26,7 @@ import kotlin.jvm.java
 class SocketForegroundService : LifecycleService() {
 
     @Inject
-    lateinit var socketRepository: SocketIORepository
+    lateinit var socketRepository: SocketIOService
 
     lateinit var userId: String
 
@@ -45,13 +43,13 @@ class SocketForegroundService : LifecycleService() {
 
         // Collect messages
         lifecycleScope.launch {
-            socketRepository.messages.collect { msg ->
+            socketRepository.getMessage().collect { msg ->
                 handleIncomingNotification(msg)
             }
         }
 
         lifecycleScope.launch {
-            socketRepository.isConnected.collect { connected ->
+            socketRepository.isConnected().collect { connected ->
                 Timber.d("Socket ${if (connected) "connected" else "disconnected"}")
             }
         }
@@ -78,7 +76,7 @@ class SocketForegroundService : LifecycleService() {
         startForeground(1, notification)
     }
 
-    private fun handleIncomingNotification(notification: SocketNotification) {
+    private fun handleIncomingNotification(notification: SocketNotification<Any>) {
         if (AppLifecycleTracker.isAppInForeground) {
             // Send broadcast to activity
             val intent = Intent("SHOW_SOCKET_DIALOG")
@@ -89,7 +87,8 @@ class SocketForegroundService : LifecycleService() {
         }
     }
 
-    private fun showSystemNotification(notification: SocketNotification) {
+
+    private fun showSystemNotification(notification: SocketNotification<Any>) {
         val nm = getSystemService(NotificationManager::class.java)
 
         val channelId = "socket_channel"

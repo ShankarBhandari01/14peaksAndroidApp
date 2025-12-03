@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,7 +26,8 @@ import com.example.restro.R
 import com.example.restro.data.model.SocketNotification
 import com.example.restro.databinding.ActivityMainBinding
 import com.example.restro.utils.Utils.showNotificationPopup
-import com.example.restro.viewmodel.OfflineDatabaseViewModel
+import com.example.restro.viewmodel.SalesViewModel
+import com.example.restro.viewmodel.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val offlineViewModel by viewModels<OfflineDatabaseViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -188,7 +187,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val socketDialogReceiver = object : BroadcastReceiver() {
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onReceive(context: Context?, intent: Intent?) {
             val notification =
                 intent?.getSerializableExtra("notification", SocketNotification::class.java)

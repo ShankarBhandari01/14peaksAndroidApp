@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
@@ -25,7 +26,9 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.Window
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
@@ -33,6 +36,8 @@ import com.example.restro.databinding.DialogNotificationPopupBinding
 import com.example.restro.databinding.DialogProgressBinding
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -307,4 +312,30 @@ object Utils {
     }
 
 
+    fun TextView.setDrawableStartClickListener(onClick: () -> Unit) {
+        this.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+
+                val drawables = this.compoundDrawablesRelative
+                val drawableStart: Drawable? = drawables[0] // start drawable
+
+                if (drawableStart != null) {
+                    val drawableWidth = drawableStart.bounds.width()
+                    val touchX = event.x.toInt()
+
+                    // If user touched within drawableStart bounds
+                    if (touchX <= paddingStart + drawableWidth) {
+                        onClick()
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
+    }
+
+
+    inline fun <reified T> String.to(): T {
+        return Gson().fromJson(this, object : TypeToken<T>() {}.type)
+    }
 }

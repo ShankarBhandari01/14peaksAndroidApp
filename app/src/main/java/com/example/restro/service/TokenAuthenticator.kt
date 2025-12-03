@@ -1,8 +1,9 @@
 package com.example.restro.service
 
 
+import com.example.restro.apis.Apis
 import com.example.restro.data.model.Session
-import com.example.restro.repos.OfflineStoreInterface
+import com.example.restro.repositories.UserRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -15,8 +16,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TokenAuthenticator @Inject constructor(
-    private val tokenManager: OfflineStoreInterface,
-    private val apiService: dagger.Lazy<ApiService>
+    private val tokenManager: UserRepository,
+    private val apis: dagger.Lazy<ApiService>
 ) : Authenticator {
     private val TAG = "TokenAuthenticator"
 
@@ -33,7 +34,7 @@ class TokenAuthenticator @Inject constructor(
                 try {
                     Timber.tag(TAG).d("Request isRetrievable")
 
-                    val refreshResponse = apiService.get().refreshToken("Bearer $refreshToken")
+                    val refreshResponse = apis.get().refreshToken()
                     if (refreshResponse.isSuccessful) {
                         val newSession: Session? = refreshResponse.body()?.data
                         // Save new Tokens

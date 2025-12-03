@@ -91,14 +91,14 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                 with(binding) {
                     sales = item
 
-                    if (item.status.lowercase() == "accepted" || item.status.lowercase() == "completed") {
-                        llChangeStatus.visibility = ViewGroup.GONE
+                    if (item.status?.lowercase() == "accepted" || item.status?.lowercase() == "completed") {
+                        llChangeStatus.actionLayout.visibility = ViewGroup.GONE
                     } else {
-                        llChangeStatus.visibility = ViewGroup.VISIBLE
+                        llChangeStatus.actionLayout.visibility = ViewGroup.VISIBLE
                     }
 
                     orderStatus.setTextColor(
-                        when (item.status.lowercase()) {
+                        when (item.status?.lowercase()) {
                             "delivered" -> "#388E3C".toColorInt()
                             "pending" -> "#FBC02D".toColorInt()
                             "cancelled" -> "#D32F2F".toColorInt()
@@ -109,22 +109,22 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                     apply {
                         rvSalesItems.apply {
                             layoutManager = LinearLayoutManager(root.context)
-                            adapter = SalesItemAdapter(item.items)
+                            adapter = SalesItemAdapter(item.items!!)
                             setRecycledViewPool(sharedPool)
                             setHasFixedSize(true)
                         }
                     }
-                    btnAccept.setOnClickListener {
+                    llChangeStatus.btnAccept.setOnClickListener {
                         Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
                     }
-                    btnReject.setOnClickListener {
+                    llChangeStatus.btnAccept.setOnClickListener {
                         Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
                     }
                 }
 
             },
             onItemClick = { sales ->
-                Toast.makeText(context, "Clicked: ${sales.customer.name}", Toast.LENGTH_SHORT)
+                Toast.makeText(context, "Clicked: ${sales.customer?.name}", Toast.LENGTH_SHORT)
                     .show()
             },
             diffCallback = object : DiffUtil.ItemCallback<Sales>() {

@@ -9,7 +9,7 @@ import com.example.restro.data.model.Sales
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 
-
+@Deprecated("use generic view adaptor @class<BasePagingAdapter> ")
 class SalesOrderAdapter(private val sales: List<Sales>) :
     RecyclerView.Adapter<SalesOrderAdapter.SalesViewHolder>() {
 
@@ -29,14 +29,14 @@ class SalesOrderAdapter(private val sales: List<Sales>) :
         val sale = sales[position]
         holder.binding.sales = sale
 
-        if (sale.status.lowercase() == "accepted") {
-            holder.binding.llChangeStatus.visibility = ViewGroup.GONE
+        if (sale.status?.lowercase() == "accepted") {
+            holder.binding.llChangeStatus.actionLayout.visibility = ViewGroup.GONE
         } else {
-            holder.binding.llChangeStatus.visibility = ViewGroup.VISIBLE
+            holder.binding.llChangeStatus.actionLayout.visibility = ViewGroup.VISIBLE
         }
 
         holder.binding.orderStatus.setTextColor(
-            when (sale.status.lowercase()) {
+            when (sale.status?.lowercase()) {
                 "delivered" -> "#388E3C".toColorInt()
                 "pending" -> "#FBC02D".toColorInt()
                 "cancelled" -> "#D32F2F".toColorInt()
@@ -44,10 +44,10 @@ class SalesOrderAdapter(private val sales: List<Sales>) :
             }
         )
 
-        holder.binding.btnAccept.setOnClickListener {
+        holder.binding.llChangeStatus.btnAccept.setOnClickListener {
             // Handle accept button click
         }
-        holder.binding.btnReject.setOnClickListener {
+        holder.binding.llChangeStatus.btnReject.setOnClickListener {
             // Handle reject button click
         }
 

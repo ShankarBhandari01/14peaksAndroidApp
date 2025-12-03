@@ -23,5 +23,4 @@ object AppModule {
         @ApplicationContext context: Context
     ): DataStore<Preferences> = context.userPreference
 
-
 }

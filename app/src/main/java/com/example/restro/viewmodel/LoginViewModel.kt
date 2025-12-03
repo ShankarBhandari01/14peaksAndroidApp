@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.restro.R
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.LoginUser
-import com.example.restro.repos.LoginRepo
+import com.example.restro.repositories.Impl.LoginRepositoryImpl
+import com.example.restro.repositories.LoginRepository
 import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.NetWorkResult
 import com.example.restro.utils.UiEvent
@@ -21,7 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: LoginRepo,
+    private val repository: LoginRepository,
     application: Application
 ) : BaseViewmodel(application) {
 

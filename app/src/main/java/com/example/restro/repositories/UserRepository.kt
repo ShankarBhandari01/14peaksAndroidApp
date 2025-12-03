@@ -1,10 +1,10 @@
-package com.example.restro.repos
+package com.example.restro.repositories
 
 import com.example.restro.data.model.Session
 import com.example.restro.data.model.User
 import kotlinx.coroutines.flow.Flow
 
-interface OfflineStoreInterface {
+interface UserRepository {
     fun getFirstLaunch(): Flow<Boolean>
     suspend fun saveFirstLaunch(isFirstLaunch: Boolean)
     suspend fun saveUserId(userId: String)

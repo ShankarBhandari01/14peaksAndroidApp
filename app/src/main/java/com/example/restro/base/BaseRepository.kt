@@ -1,5 +1,6 @@
 package com.example.restro.base
 
+import com.example.restro.data.model.SocketNotification
 import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.NetWorkResult
 import kotlinx.coroutines.Dispatchers
@@ -37,4 +38,6 @@ open class BaseRepository {
             emit(NetWorkResult.Error(e.localizedMessage ?: "Unknown error"))
         }
     }.flowOn(Dispatchers.IO)
+
+
 }

@@ -61,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@{`Customer Id: ` + sales.customer.customerId}" />
+                android:text="@{`Customer Id: ` + sales.customer._id}" />
 
             <!-- Customer-->
             <TextView
@@ -249,41 +249,9 @@
                 app:chipCornerRadius="8dp" />
 
             <!-- Action Buttons -->
-            <LinearLayout
+            <include
                 android:id="@+id/ll_change_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                android:weightSum="2">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_accept"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="Accept"
-                    android:textColor="@android:color/white"
-                    app:backgroundTint="@android:color/holo_green_dark"
-                    app:cornerRadius="12dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_reject"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="Reject"
-                    android:textColor="@android:color/white"
-                    app:backgroundTint="@android:color/holo_red_dark"
-                    app:cornerRadius="12dp" />
-
-            </LinearLayout>
+                layout="@layout/layout_action_buttons" />
 
         </LinearLayout>
 

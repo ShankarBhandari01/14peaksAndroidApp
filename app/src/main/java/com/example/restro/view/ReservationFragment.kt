@@ -38,7 +38,7 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
     private val TAG = "ReservationFragment"
     private var _binding: FragmentReservationBinding? = null
     private val binding get() = _binding!!
-
+    lateinit var bottomSheet: FilterBottomSheet
     private val activeFilters = mutableListOf<FilterOption>()
 
     private val viewModel by viewModels<SalesViewModel>()
@@ -58,11 +58,19 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
         setUpBottomSheetView()
         setUpRecyclerViewPagingData()
 
-        viewModel.loadReservations()
+
+
+        binding.iconFilterButton.setOnClickListener {
+            if (bottomSheet.isVisible) {
+                bottomSheet.dismiss()
+            }
+        }
+
+
     }
 
     private fun setUpBottomSheetView() {
-        val bottomSheet = FilterBottomSheet()
+        bottomSheet = FilterBottomSheet()
 
         binding.iconFilterButton.setOnClickListener {
             if (bottomSheet.isVisible) {
@@ -94,25 +102,52 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
                     tvSpecialRequests.text =
                         reservation.special_requests.ifEmpty { "No special requests" }
                     tvCreatedDate.text = "Created: ${reservation.createdDate}"
+
+
+                    if (reservation.status.lowercase() == "pending") {
+                        llChangeStatus.actionLayout.visibility = ViewGroup.VISIBLE
+                    } else {
+                        llChangeStatus.actionLayout.visibility = ViewGroup.GONE
+                    }
+
+
+                    // Color status badge
+                    val statusColor = when (reservation.status.lowercase()) {
+                        "confirmed" -> ContextCompat.getColor(
+                            root.context,
+                            R.color.successColor
+                        )
+
+                        "pending" -> ContextCompat.getColor(
+                            root.context,
+                            R.color.warningColor
+                        )
+
+                        "cancelled" -> ContextCompat.getColor(
+                            root.context,
+                            R.color.errorColor
+                        )
+
+                        else -> ContextCompat.getColor(root.context, R.color.primaryColor)
+                    }
+                    (tvStatus.background as GradientDrawable).setColor(statusColor)
+                    tvStatus.text = reservation.status
+
+
+                    llChangeStatus.btnAccept.setOnClickListener {
+                        Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
+                    }
+                    llChangeStatus.btnAccept.setOnClickListener {
+                        Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
+                    }
                 }
-
-
-                // Color status badge
-                val statusColor = when (reservation.status.lowercase()) {
-                    "confirmed" -> ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.successColor
-                    )
-
-                    "pending" -> ContextCompat.getColor(binding.root.context, R.color.warningColor)
-                    "cancelled" -> ContextCompat.getColor(binding.root.context, R.color.errorColor)
-                    else -> ContextCompat.getColor(binding.root.context, R.color.primaryColor)
-                }
-                (binding.tvStatus.background as GradientDrawable).setColor(statusColor)
-                binding.tvStatus.text = reservation.status
             },
             onItemClick = { reservation ->
-                Toast.makeText(context, "Clicked: ${reservation.customer_name}", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    context,
+                    "Clicked: ${reservation.customer_name}",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             },
             diffCallback = object : DiffUtil.ItemCallback<Reservation>() {
@@ -127,9 +162,10 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
         lifecycleScope.launch {
             viewModel.reservationData.collectLatest { pagingData ->
-                binding.reservationRecyclerView.adapter = reservationAdapter.withLoadStateFooter(
-                    footer = LoadingStateAdapter { reservationAdapter.retry() }
-                )
+                binding.reservationRecyclerView.adapter =
+                    reservationAdapter.withLoadStateFooter(
+                        footer = LoadingStateAdapter { reservationAdapter.retry() }
+                    )
                 reservationAdapter.submitData(pagingData)
             }
 
@@ -153,6 +189,9 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
                 }
             }
         }
+
+        // call load reservation api
+        viewModel.loadReservations()
     }
 
     private fun showAppliedFilters(filters: List<FilterOption>) {
@@ -176,4 +215,6 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
         //  socketIOViewModel.disconnect()
         _binding = null
     }
+
 }
+
