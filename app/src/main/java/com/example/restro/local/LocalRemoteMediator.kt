@@ -7,86 +7,132 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.restro.data.model.RemoteKeys
 import com.example.restro.data.model.Reservation
-import com.example.restro.data.model.Sales
 import com.example.restro.service.ApiService
+import retrofit2.HttpException
+import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-class LocalRemoteMediator<T : Any>(
+class ReservationRemoteMediator(
     private val api: ApiService,
-    private val db: OfflineDatabase,
-    private val dataType: String
-) : RemoteMediator<Int, T>() {
+    private val db: OfflineDatabase
+) : RemoteMediator<Int, Reservation>() {
 
-    private val salesDao = db.saleReservationDao()
+    private val reservationDao = db.saleReservationDao()
     private val remoteKeysDao = db.remoteKeysDao()
 
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, T>): MediatorResult {
-        try {
-            val page = when (loadType) {
-                LoadType.REFRESH -> 1
+    override suspend fun initialize(): InitializeAction {
+        // Always refresh to ensure data consistency
+        return InitializeAction.LAUNCH_INITIAL_REFRESH
+    }
 
-                LoadType.PREPEND -> return MediatorResult.Success(true)
+    override suspend fun load(
+        loadType: LoadType,
+        state: PagingState<Int, Reservation>
+    ): MediatorResult {
+        return try {
+
+
+            val page = when (loadType) {
+                LoadType.REFRESH -> {
+                    val remoteKey = getRemoteKeyClosestToCurrentPosition(state)
+                    remoteKey?.nextKey?.minus(1) ?: 1
+                }
+
+                LoadType.PREPEND -> {
+                    return MediatorResult.Success(endOfPaginationReached = true)
+                }
 
                 LoadType.APPEND -> {
-                    val lastItem = state.lastItemOrNull() ?: return MediatorResult.Success(false)
+                    val lastItem = state.lastItemOrNull()
 
-                    val id =
-                        if (dataType == "sales") (lastItem as Sales)._id else (lastItem as Reservation)._id
+                    if (lastItem == null) {
+                        // Database might be empty or not loaded yet
+                        // Check if we have any keys at all
+                        val anyKey = remoteKeysDao.getAnyKey()
+                        if (anyKey == null) {
+                            return MediatorResult.Success(endOfPaginationReached = true)
+                        }
+                    }
 
-                    val remoteKeys = remoteKeysDao.getKey(id)
-                    remoteKeys?.nextKey ?: return MediatorResult.Success(true)
+                    val remoteKey = getRemoteKeyForLastItem(state)
+
+
+                    if (remoteKey == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
+
+                    if (remoteKey.nextKey == null) {
+                        return MediatorResult.Success(endOfPaginationReached = true)
+                    }
+
+                    remoteKey.nextKey
                 }
             }
 
-            // Fetch from API
-            val (items, endReached) = if (dataType == "sales") fetchSales(
-                page,
-                state.config.pageSize
-            )
-            else fetchReservations(page, state.config.pageSize)
+            val response = api.getAllReservation(page, state.config.pageSize)
+            val reservations = response.data.data
+            val pagination = response.data.pagination
+
+            println(" Fetched ${reservations.size} items from page $page")
+            println("Pagination: currentPage=${pagination.currentPage}, totalPages=${pagination.totalPages}")
+
+            val endOfPaginationReached = pagination.currentPage >= pagination.totalPages
 
             db.withTransaction {
-
                 if (loadType == LoadType.REFRESH) {
+                    reservationDao.clearReservation()
                     remoteKeysDao.clearKeys()
-                    //salesDao.clearReservation()
+                    println("Cleared database")
                 }
 
-                val keys = items.map {
-                    val id = if (dataType == "sales") (it as Sales)._id else (it as Reservation)._id
-                    RemoteKeys(
-                        id = id,
-                        prevKey = if (page == 1) null else page - 1,
-                        nextKey = if (endReached) null else page + 1
+                // Add position to each reservation
+                val reservationsWithPosition = reservations.mapIndexed { index, reservation ->
+                    reservation.copy(
+                        pagePosition = ((page - 1) * state.config.pageSize) + index
                     )
                 }
 
+                reservationDao.upsertReservation(reservationsWithPosition)
+
+                val keys = reservations.mapIndexed { index, reservation ->
+                    RemoteKeys(
+                        id = reservation._id,
+                        prevKey = if (page == 1) null else page - 1,
+                        nextKey = if (endOfPaginationReached) null else page + 1,
+                        position = ((page - 1) * state.config.pageSize) + index
+                    )
+                }
                 remoteKeysDao.insertAll(keys)
 
-                if (dataType == "sales") salesDao.insertSalesList(items as List<Sales>)
-                else salesDao.upsertReservation(items as List<Reservation>)
+                println("Saved ${reservations.size} items and ${keys.size} keys")
+                println("Sample key - ID: ${keys.firstOrNull()?.id}, nextKey: ${keys.firstOrNull()?.nextKey}")
+
+                // Verify data was actually saved
+                val count = reservationDao.getCount()
+                println("Total items in database: $count")
             }
 
-            return MediatorResult.Success(endReached)
+            println("Success - endReached: $endOfPaginationReached")
+            MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
 
-        } catch (e: Exception) {
-            return MediatorResult.Error(e)
+        } catch (e: IOException) {
+            MediatorResult.Error(e)
+        } catch (e: HttpException) {
+            MediatorResult.Error(e)
         }
     }
 
-
-    private suspend fun fetchSales(page: Int, limit: Int): Pair<List<Sales>, Boolean> {
-        val res = api.getSalesOrdersList("desc", page, limit)
-        val pg = res.data.pagination
-        return res.data.data to (pg.currentPage >= pg.totalPages)
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, Reservation>): RemoteKeys? {
+        return state.lastItemOrNull()?.let { reservation ->
+            remoteKeysDao.getKey(reservation._id)
+        }
     }
 
-    private suspend fun fetchReservations(
-        page: Int, limit: Int
-    ): Pair<List<Reservation>, Boolean> {
-        val res = api.getAllReservation(page, limit)
-        val pg = res.data.pagination
-        return res.data.data to (pg.currentPage >= pg.totalPages)
+    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, Reservation>): RemoteKeys? {
+        return state.anchorPosition?.let { position ->
+            state.closestItemToPosition(position)?._id?.let { id ->
+                remoteKeysDao.getKey(id)
+            }
+        }
     }
 }
-

@@ -7,7 +7,7 @@ import com.example.restro.BuildConfig
 import com.example.restro.base.BaseRepository
 import com.example.restro.data.model.Notification
 import com.example.restro.data.model.SocketNotification
-import com.example.restro.data.paging.PagingSource
+import com.example.restro.data.paging.ApiPagingSource
 import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.ApiService
@@ -66,7 +66,7 @@ class SocketIOServiceImpl @Inject constructor(
             config = PagingConfig(pageSize = limit, enablePlaceholders = true),
 
             pagingSourceFactory = {
-                PagingSource { page, limit ->
+                ApiPagingSource { page, limit ->
                     apiService.getNotifications(page, limit).data
                 }
             }).flow

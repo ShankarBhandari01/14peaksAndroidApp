@@ -15,7 +15,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_60sdp"
+            android:layout_height="@dimen/_40sdp"
             app:collapsedTitleGravity="center_vertical"
             app:collapsedTitleTextColor="@android:color/white"
             app:contentScrim="@android:color/white"
@@ -74,11 +74,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Content -->
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/dashboard_nav_host"
@@ -87,10 +82,7 @@
             android:layout_height="0dp"
             app:defaultNavHost="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-
             app:navGraph="@navigation/bottom_nav_graph" />
-
-    </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

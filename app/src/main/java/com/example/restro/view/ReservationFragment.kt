@@ -26,7 +26,9 @@ import com.example.restro.view.bottom_sheet_dialog.FilterBottomSheet
 import com.example.restro.viewmodel.SalesViewModel
 import com.example.restro.viewmodel.NotificationViewModel
 import com.google.android.material.chip.Chip
+import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -40,6 +42,9 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
     private val binding get() = _binding!!
     lateinit var bottomSheet: FilterBottomSheet
     private val activeFilters = mutableListOf<FilterOption>()
+    private var tabObserverJob: Job? = null
+
+    private lateinit var reservationAdapter: BasePagingAdapter<Reservation, ReservationItemBinding>
 
     private val viewModel by viewModels<SalesViewModel>()
 
@@ -54,11 +59,9 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setUpBottomSheetView()
         setUpRecyclerViewPagingData()
-
-
+        setUpBottomSheetView()
+        setupTabLayout()
 
         binding.iconFilterButton.setOnClickListener {
             if (bottomSheet.isVisible) {
@@ -69,13 +72,59 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
     }
 
+    private fun setupTabLayout() {
+        with(binding) {
+            reservationTabLayout.addTab(reservationTabLayout.newTab().setText("New Reservation"))
+            reservationTabLayout.addTab(reservationTabLayout.newTab().setText("Old Reservation"))
+
+            reservationTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    when (tab.position) {
+                        0 -> observeNewReservations()
+                        1 -> observeOldReservations()
+                    }
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab) {}
+                override fun onTabReselected(tab: TabLayout.Tab) {}
+            })
+        }
+
+        viewModel.loadReservations()
+       // viewModel.observeReservations()
+
+        observeNewReservations()
+    }
+
+    private fun observeNewReservations() {
+        lifecycleScope.launch {
+            viewModel.reservationData.collectLatest {
+                reservationAdapter.submitData(it)
+            }
+        }
+
+       /* tabObserverJob?.cancel()
+        tabObserverJob = lifecycleScope.launch {
+            viewModel.newReservation.collectLatest {
+                reservationAdapter.submitData(it)
+            }
+        }*/
+    }
+
+    private fun observeOldReservations() {
+        /*tabObserverJob?.cancel()
+        tabObserverJob = lifecycleScope.launch {
+            viewModel.oldReservation.collectLatest {
+                reservationAdapter.submitData(it)
+            }
+        }*/
+    }
+
     private fun setUpBottomSheetView() {
         bottomSheet = FilterBottomSheet()
+        bottomSheet.isCancelable = false
 
         binding.iconFilterButton.setOnClickListener {
-            if (bottomSheet.isVisible) {
-                bottomSheet.dismiss()
-            }
 
             bottomSheet.onFiltersApplied = { selectedFilters ->
                 activeFilters.clear()
@@ -88,9 +137,8 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
     private fun setUpRecyclerViewPagingData() {
         val shimmerAdapter = ShimmerAdapter()
-        binding.reservationRecyclerView.adapter = shimmerAdapter
 
-        val reservationAdapter = BasePagingAdapter(
+        reservationAdapter = BasePagingAdapter(
             inflate = ReservationItemBinding::inflate,
             bindItem = { binding, reservation: Reservation ->
                 with(binding) {
@@ -160,38 +208,20 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
         )
 
 
-        lifecycleScope.launch {
-            viewModel.reservationData.collectLatest { pagingData ->
-                binding.reservationRecyclerView.adapter =
-                    reservationAdapter.withLoadStateFooter(
-                        footer = LoadingStateAdapter { reservationAdapter.retry() }
-                    )
-                reservationAdapter.submitData(pagingData)
-            }
-
-        }
+        binding.reservationRecyclerView.adapter =
+            reservationAdapter.withLoadStateFooter(LoadingStateAdapter { reservationAdapter.retry() })
 
         reservationAdapter.addLoadStateListener { loadState ->
             when (loadState.refresh) {
-                is LoadState.Loading -> {
-                    binding.reservationRecyclerView.adapter = shimmerAdapter
-                }
+                is LoadState.Loading -> binding.reservationRecyclerView.adapter = shimmerAdapter
+                is LoadState.NotLoading -> binding.reservationRecyclerView.adapter =
+                    reservationAdapter.withLoadStateFooter(LoadingStateAdapter { reservationAdapter.retry() })
 
-                is LoadState.NotLoading -> {
-                    // Show actual data
-                    binding.reservationRecyclerView.adapter =
-                        reservationAdapter.withLoadStateFooter(footer = LoadingStateAdapter { reservationAdapter.retry() })
-                }
-
-                is LoadState.Error -> {
-                    // Handle errors
-                    Toast.makeText(context, "Failed to load data", Toast.LENGTH_SHORT).show()
-                }
+                is LoadState.Error -> Toast.makeText(context, "Failed to load", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
-        // call load reservation api
-        viewModel.loadReservations()
     }
 
     private fun showAppliedFilters(filters: List<FilterOption>) {
@@ -212,7 +242,6 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //  socketIOViewModel.disconnect()
         _binding = null
     }
 

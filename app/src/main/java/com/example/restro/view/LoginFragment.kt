@@ -23,7 +23,7 @@ import com.example.restro.utils.Utils.getGreetingMessage
 import com.example.restro.viewmodel.LoginViewModel
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -66,7 +66,7 @@ class LoginFragment : Fragment() {
 
     private fun automaticLogin() {
         lifecycleScope.launch {
-            if (!offlineViewModel.isFirstLaunch.last()) {
+            if (!offlineViewModel.isFirstLaunch.first()) {
                 binding.loginButton.performClick()
             }
         }

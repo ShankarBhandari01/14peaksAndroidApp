@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.restro.data.model.ApiResponse
 
-class PagingSource<T : Any>(
+class ApiPagingSource<T : Any>(
     private val fetchData: suspend (page: Int, limit: Int) -> ApiResponse<T>
 ) : PagingSource<Int, T>() {
 

@@ -23,7 +23,7 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
     lateinit var adapter: FilterAdapter
     private var selectedFilters = mutableListOf<FilterOption>()
     private val filters = mutableListOf<FilterOption>()
-
+    lateinit var dialog: BottomSheetDialog
     var onFiltersApplied: ((List<FilterOption>) -> Unit)? = null
 
     override fun onCreateView(
@@ -36,7 +36,8 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+
         dialog.setOnShowListener {
             val bottomSheet =
                 dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
@@ -47,6 +48,11 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
                 it.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }
         }
+
+        binding.btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
         return dialog
     }
 
@@ -67,7 +73,7 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
             Timber.tag("Filter").d("${selectedFilter.name} = ${selectedFilter.isSelected}")
             selectedFilters.add(selectedFilter)
         }
-        binding.rvFilters.layoutManager  = LinearLayoutManager(requireContext())
+        binding.rvFilters.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFilters.adapter = adapter
     }
 
@@ -87,4 +93,5 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

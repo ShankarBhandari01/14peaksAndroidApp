@@ -32,17 +32,20 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
+import com.example.restro.data.model.Reservation
 import com.example.restro.databinding.DialogNotificationPopupBinding
 import com.example.restro.databinding.DialogProgressBinding
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -53,8 +56,7 @@ object Utils {
         val appProcesses = activityManager.runningAppProcesses ?: return false
         val packageName = packageName
         return appProcesses.any {
-            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                    it.processName == packageName
+            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && it.processName == packageName
         }
     }
 
@@ -67,19 +69,15 @@ object Utils {
         // Create channel if Android >= O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId,
-                "Socket Messages",
-                NotificationManager.IMPORTANCE_HIGH
+                channelId, "Socket Messages", NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("New Message")
-            .setContentText(message)
-            .setSmallIcon(R.drawable.baseline_notifications_active_24)
-            .setAutoCancel(true)
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, channelId).setContentTitle("New Message")
+                .setContentText(message).setSmallIcon(R.drawable.baseline_notifications_active_24)
+                .setAutoCancel(true).build()
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
@@ -97,15 +95,13 @@ object Utils {
             } else {
                 // Fallback → ANDROID_ID
                 Settings.Secure.getString(
-                    context.contentResolver,
-                    Settings.Secure.ANDROID_ID
+                    context.contentResolver, Settings.Secure.ANDROID_ID
                 )
             }
         } catch (e: Exception) {
             // In case Google Play Services is missing or blocked
             Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID
+                context.contentResolver, Settings.Secure.ANDROID_ID
             )
         }
     }
@@ -289,14 +285,10 @@ object Utils {
 
     //
     fun Context.showNotificationPopup(
-        title: String,
-        message: String,
-        onViewClick: (() -> Unit)? = null
+        title: String, message: String, onViewClick: (() -> Unit)? = null
     ) {
         val dialogView = DialogNotificationPopupBinding.inflate(LayoutInflater.from(this))
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView.root)
-            .create()
+        val dialog = AlertDialog.Builder(this).setView(dialogView.root).create()
 
         dialogView.tvNotificationTitle.text = title
         dialogView.tvNotificationMessage.text = message
@@ -334,6 +326,21 @@ object Utils {
         }
     }
 
+    fun isNewReservation(reservation: Reservation, days: Long): Boolean {
+        return try {
+            val reserved = LocalDateTime.parse(
+                reservation.reservation_date,
+                DateTimeFormatter.ISO_DATE_TIME
+            )
+
+            val cutoff = LocalDateTime.now().minusDays(days)
+
+            reserved.isAfter(cutoff)
+        } catch (e: Exception) {
+            Timber.d(e.localizedMessage)
+            false
+        }
+    }
 
     inline fun <reified T> String.to(): T {
         return Gson().fromJson(this, object : TypeToken<T>() {}.type)

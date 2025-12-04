@@ -66,6 +66,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
     private fun setupFilterBottomSheet() {
         val bottomSheet = FilterBottomSheet()
+        bottomSheet.isCancelable = false
 
         binding.iconFilterButton.setOnClickListener {
 

@@ -15,7 +15,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_60sdp"
+            android:layout_height="@dimen/_40sdp"
             app:collapsedTitleGravity="center_vertical"
             app:collapsedTitleTextColor="@android:color/white"
             app:contentScrim="@android:color/white"
@@ -51,8 +51,8 @@
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="TODO"
-                        android:scaleType="centerInside"
                         android:padding="@dimen/_12ssp"
+                        android:scaleType="centerInside"
                         android:src="@drawable/baseline_notifications_active_24"
                         app:tint="?attr/colorOnSurface" />
 
@@ -74,22 +74,14 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Content -->
-    <androidx.core.widget.NestedScrollView
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/dashboard_nav_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/dashboard_nav_host"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:defaultNavHost="false"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:navGraph="@navigation/bottom_nav_graph" />
-
-    </androidx.core.widget.NestedScrollView>
+        app:defaultNavHost="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:navGraph="@navigation/bottom_nav_graph" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

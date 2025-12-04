@@ -25,5 +25,6 @@ data class Reservation(
     val special_requests: String,
     val status: String,
     val table_id: String,
-    val updated_ts: String
+    val updated_ts: String,
+    val pagePosition: Int = 0
 )

@@ -3,6 +3,8 @@ package com.example.restro.local
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -33,7 +35,7 @@ interface SaleReservationDao {
 
 
     @Transaction
-    @Query("SELECT * FROM reservation_table ORDER BY createdDate DESC")
+    @Query("SELECT * FROM reservation_table ORDER BY pagePosition ASC")
     fun getReservationPaging(): PagingSource<Int, Reservation>
 
     // ------------------- INSERT -------------------
@@ -102,13 +104,25 @@ interface SaleReservationDao {
 
     // ------------------- RESERVATION QUERY -------------------
 
+    @Query("SELECT MAX(pagePosition) FROM reservation_table")
+    suspend fun getMaxPosition(): Int?
+
+    @Query("UPDATE reservation_table SET pagePosition = pagePosition + 1")
+    suspend fun incrementAllPositions()
+
+    @Query("SELECT COUNT(*) FROM reservation_table")
+    suspend fun getCount(): Int
+
     @Upsert
     suspend fun upsertReservation(reservation: Reservation)
 
     @Query("Delete from reservation_table")
     suspend fun clearReservation()
 
-    @Upsert
+    @Query("Delete from sales_table")
+    suspend fun clearSales()
+
+    @Insert(onConflict = REPLACE)
     suspend fun upsertReservation(reservation: List<Reservation>)
 
     // ------------------- DELETE -------------------

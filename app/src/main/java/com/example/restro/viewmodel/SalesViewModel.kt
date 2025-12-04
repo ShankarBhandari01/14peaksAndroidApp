@@ -6,11 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.Reservation
 import com.example.restro.data.model.Sales
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.utils.UiEvent
+import com.example.restro.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,6 +37,12 @@ class SalesViewModel @Inject constructor(
 
     val reservationData: Flow<PagingData<Reservation>> = _reservationData
 
+    private val _newReservation = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
+    val newReservation: Flow<PagingData<Reservation>> = _newReservation
+
+    private val _oldReservation = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
+    val oldReservation: Flow<PagingData<Reservation>> = _oldReservation
+
     fun loadSalesOrders(sort: String = "desc") {
         viewModelScope.launch {
             repository.getSalesOrdersPaging(sort)
@@ -46,7 +55,7 @@ class SalesViewModel @Inject constructor(
 
     fun loadReservations() {
         viewModelScope.launch {
-            repository.getAllReservation()
+            repository.getAllReservation(10)
                 .cachedIn(viewModelScope)
                 .collectLatest { pagingData ->
                     _reservationData.emit(pagingData)
@@ -54,5 +63,21 @@ class SalesViewModel @Inject constructor(
         }
     }
 
+    fun observeReservations() {
+        viewModelScope.launch {
+            reservationData.collectLatest { pagingData ->
 
+                val newData = pagingData.filter { res ->
+                    Utils.isNewReservation(res, 5)
+                }
+
+                val oldData = pagingData.filter { res ->
+                    !Utils.isNewReservation(res, 5)
+                }
+
+                _newReservation.emit(newData)
+                _oldReservation.emit(oldData)
+            }
+        }
+    }
 }
