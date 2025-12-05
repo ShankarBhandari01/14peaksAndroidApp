@@ -10,9 +10,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import com.example.restro.R
 import com.example.restro.data.model.Notification
 import com.example.restro.databinding.ActivityNotificationBinding
 import com.example.restro.databinding.NotificationLayoutBinding
+import com.example.restro.utils.Utils.setDrawableStartClickListener
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.viewmodel.NotificationViewModel
@@ -35,6 +37,10 @@ class NotificationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        // Handle click
+        binding.tvNotificationTitle.setDrawableStartClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         val notificationAdapter = BasePagingAdapter(
             inflate = NotificationLayoutBinding::inflate,
@@ -65,6 +71,7 @@ class NotificationActivity : AppCompatActivity() {
                     footer = LoadingStateAdapter { notificationAdapter.retry() }
                 )
                 notificationAdapter.submitData(pagingData)
+
             }
         }
 

@@ -11,7 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.paging.filter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.restro.R
 import com.example.restro.data.model.FilterOption
 import com.example.restro.data.model.Sales
@@ -19,6 +22,7 @@ import com.example.restro.databinding.FragmentSalesOrderBinding
 import com.example.restro.databinding.SalesListViewBinding
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
+import com.example.restro.view.adapters.SalesItemAdapter
 import com.example.restro.view.adapters.ShimmerAdapter
 import com.example.restro.view.bottom_sheet_dialog.FilterBottomSheet
 import com.example.restro.viewmodel.SalesViewModel
@@ -33,7 +37,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     private val TAG = "SalesOrderFragment"
     private var _binding: FragmentSalesOrderBinding? = null
     private val binding get() = _binding!!
-
+    private val sharedPool = RecyclerView.RecycledViewPool()
 
     private val activeFilters = mutableListOf<FilterOption>()
 
@@ -62,6 +66,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
 
     private fun setupFilterBottomSheet() {
         val bottomSheet = FilterBottomSheet()
+        bottomSheet.isCancelable = false
 
         binding.iconFilterButton.setOnClickListener {
 
@@ -84,32 +89,43 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
         val pagingAdapter = BasePagingAdapter(
             inflate = SalesListViewBinding::inflate,
             bindItem = { binding, item: Sales ->
-                binding.sales = item
+                with(binding) {
+                    sales = item
 
-                if (item.status.lowercase() == "accepted" || item.status.lowercase() == "completed") {
-                    binding.llChangeStatus.visibility = ViewGroup.GONE
-                } else {
-                    binding.llChangeStatus.visibility = ViewGroup.VISIBLE
-                }
-
-                binding.orderStatus.setTextColor(
-                    when (item.status.lowercase()) {
-                        "delivered" -> "#388E3C".toColorInt()
-                        "pending" -> "#FBC02D".toColorInt()
-                        "cancelled" -> "#D32F2F".toColorInt()
-                        else -> Color.BLACK
+                    if (item.status?.lowercase() == "accepted" || item.status?.lowercase() == "completed") {
+                        llChangeStatus.actionLayout.visibility = ViewGroup.GONE
+                    } else {
+                        llChangeStatus.actionLayout.visibility = ViewGroup.VISIBLE
                     }
-                )
 
-                binding.btnAccept.setOnClickListener {
-                    Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
+                    orderStatus.setTextColor(
+                        when (item.status?.lowercase()) {
+                            "delivered" -> "#388E3C".toColorInt()
+                            "pending" -> "#FBC02D".toColorInt()
+                            "cancelled" -> "#D32F2F".toColorInt()
+                            else -> Color.BLACK
+                        }
+                    )
+
+                    apply {
+                        rvSalesItems.apply {
+                            layoutManager = LinearLayoutManager(root.context)
+                            adapter = SalesItemAdapter(item.items!!)
+                            setRecycledViewPool(sharedPool)
+                            setHasFixedSize(true)
+                        }
+                    }
+                    llChangeStatus.btnAccept.setOnClickListener {
+                        Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
+                    }
+                    llChangeStatus.btnAccept.setOnClickListener {
+                        Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                binding.btnReject.setOnClickListener {
-                    Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
-                }
+
             },
             onItemClick = { sales ->
-                Toast.makeText(context, "Clicked: ${sales.customer.name}", Toast.LENGTH_SHORT)
+                Toast.makeText(context, "Clicked: ${sales.customer?.name}", Toast.LENGTH_SHORT)
                     .show()
             },
             diffCallback = object : DiffUtil.ItemCallback<Sales>() {
@@ -127,6 +143,7 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
                 binding.salesRecyclerView.adapter = pagingAdapter.withLoadStateFooter(
                     footer = LoadingStateAdapter { pagingAdapter.retry() }
                 )
+
                 pagingAdapter.submitData(pagingData)
             }
         }

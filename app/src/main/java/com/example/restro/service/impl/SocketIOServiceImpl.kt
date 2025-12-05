@@ -1,18 +1,19 @@
-package com.example.restro.repos
+package com.example.restro.service.impl
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.restro.BuildConfig
-import com.example.restro.apis.ApisServicesImpl
 import com.example.restro.base.BaseRepository
 import com.example.restro.data.model.Notification
 import com.example.restro.data.model.SocketNotification
-import com.example.restro.data.paging.PagingSource
+import com.example.restro.data.paging.ApiPagingSource
 import com.example.restro.di.intercepter.NetworkHelper
+import com.example.restro.repositories.RoomRepository
+import com.example.restro.service.ApiService
+import com.example.restro.service.SocketIOService
 import com.example.restro.utils.ConstantsValues
-import com.example.restro.utils.ConstantsValues.Companion.supervisedScope
-import com.google.gson.Gson
+import com.example.restro.utils.Utils.to
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.Flow
@@ -29,43 +30,52 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SocketIORepository @Inject constructor(
-    private val apisServicesImpl: ApisServicesImpl, private val networkHelper: NetworkHelper
-) : BaseRepository() {
+class SocketIOServiceImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val networkHelper: NetworkHelper,
+    private val roomRepository: RoomRepository
+) : SocketIOService, BaseRepository() {
 
     private var socket: Socket? = null
-    private val gson = Gson()
 
     // Message flow with buffer
-    private val _messages = MutableSharedFlow<SocketNotification>(
+    private val _messages = MutableSharedFlow<SocketNotification<Any>>(
         replay = 0, extraBufferCapacity = 64
     )
 
-    val messages: SharedFlow<SocketNotification> = _messages.asSharedFlow()
+    val messages: SharedFlow<SocketNotification<Any>> = _messages.asSharedFlow()
 
     // Connection state as StateFlow
     private val _isConnected = MutableStateFlow(false)
-    val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
+    val isConnect: StateFlow<Boolean> = _isConnected.asStateFlow()
+
+    override fun getMessage(): SharedFlow<SocketNotification<Any>> {
+        return messages
+    }
+
+    override fun isConnected(): StateFlow<Boolean> {
+        return isConnect
+    }
 
 
     // load notifications from api call
-    fun getApiNotifications(
-        limit: Int = 10
+    override fun getApiNotifications(
+        limit: Int
     ): Flow<PagingData<Notification>> {
         return Pager(
             config = PagingConfig(pageSize = limit, enablePlaceholders = true),
 
             pagingSourceFactory = {
-                PagingSource { page, limit ->
-                    apisServicesImpl.getNotifications(page, limit).data
+                ApiPagingSource { page, limit ->
+                    apiService.getNotifications(page, limit).data
                 }
             }).flow
     }
 
     @Synchronized
-    fun connect(userId: String) {
+    override fun connect(userId: String) {
         if (socket?.connected() == true) {
-            Timber.tag("SocketIO").d("Already connected")
+            Timber.Forest.tag("SocketIO").d("Already connected")
             return
         }
 
@@ -95,17 +105,21 @@ class SocketIORepository @Inject constructor(
             }
 
             on(Socket.EVENT_CONNECT_ERROR) { args ->
-                Timber.tag("SocketIO").e("️ Connection error: ${args.firstOrNull()}")
+                Timber.Forest.tag("SocketIO").e("️ Connection error: ${args.firstOrNull()}")
             }
 
             on("notification") { args ->
                 if (args.isNotEmpty()) {
-                    supervisedScope.launch {
+                    ConstantsValues.supervisedScope.launch {
                         val raw = args.firstOrNull()?.toString() ?: return@launch
                         runCatching {
                             Timber.d(raw)
 
-                            val notification = gson.fromJson(raw, SocketNotification::class.java)
+                            val notification: SocketNotification<Any> =
+                                raw.to<SocketNotification<Any>>()
+
+                            roomRepository.syncDataSalesReservation(raw, notification)
+
                             _messages.emit(notification)
 
                         }.onFailure {
@@ -120,9 +134,9 @@ class SocketIORepository @Inject constructor(
     }
 
     @Synchronized
-    fun disconnect() {
+    override fun disconnect() {
         socket?.let { s ->
-            Timber.tag("SocketIO").d("Disconnecting socket")
+            Timber.Forest.tag("SocketIO").d("Disconnecting socket")
             s.off(Socket.EVENT_CONNECT)
             s.off(Socket.EVENT_DISCONNECT)
             s.off(Socket.EVENT_CONNECT_ERROR)
@@ -136,7 +150,7 @@ class SocketIORepository @Inject constructor(
      * Reconnect with new userId (e.g. after login/logout)
      */
     @Synchronized
-    fun reconnect(userId: String) {
+    override fun reconnect(userId: String) {
         disconnect()
         connect(userId)
     }

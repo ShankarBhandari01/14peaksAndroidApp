@@ -118,5 +118,10 @@
             android:textColor="@color/textTertiary"
             android:textSize="11sp" />
 
+        <!-- Action Buttons -->
+        <include
+            android:id="@+id/ll_change_status"
+            layout="@layout/layout_action_buttons" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

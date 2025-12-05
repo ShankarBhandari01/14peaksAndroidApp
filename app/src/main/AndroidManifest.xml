@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
-
     <application
         android:name=".application.RestroApplication"
         android:allowBackup="true"
@@ -24,12 +23,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".view.ActivityCreateMenus"
+            android:exported="false" />
+        <activity
             android:name=".view.NotificationDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".view.NotificationActivity"
             android:exported="false"
-            android:theme="@style/Theme.RotaPredictionApp"
+            android:theme="@style/NotificationActivityAnimation"
             android:windowSoftInputMode="adjustPan|stateAlwaysVisible" />
         <activity
             android:name=".view.MainActivity"
@@ -44,9 +46,20 @@
         </activity>
 
         <service
-            android:name="com.example.restro.service.SocketForegroundService"
+            android:name=".service.SocketForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
     </application>
 
 </manifest>

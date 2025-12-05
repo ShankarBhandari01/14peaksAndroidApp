@@ -11,7 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
-import com.example.restro.viewmodel.OfflineDatabaseViewModel
+import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,7 +23,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
 
     // shared across multiple fragments
-    private val offlineDatabaseViewModel by activityViewModels<OfflineDatabaseViewModel>()
+    private val offlineDatabaseViewModel by activityViewModels<UserViewModel>()
 
 
     override fun onCreateView(
@@ -51,7 +51,8 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
 
         binding.imgNotificationBtn.setOnClickListener {
-            startActivity(NotificationActivity.getIntent(requireContext()))
+            val intent = NotificationActivity.getIntent(requireContext())
+            startActivity(intent)
         }
     }
 

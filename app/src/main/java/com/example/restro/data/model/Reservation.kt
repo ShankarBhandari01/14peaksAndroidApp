@@ -1,6 +1,18 @@
 package com.example.restro.data.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+
+@Entity(
+    tableName = "reservation_table",
+    indices = [Index(value = ["id"])]
+)
+
 data class Reservation(
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     val _id: String,
     val createdDate: String,
     val customer_email: String,
@@ -13,5 +25,6 @@ data class Reservation(
     val special_requests: String,
     val status: String,
     val table_id: String,
-    val updated_ts: String
+    val updated_ts: String,
+    val pagePosition: Int = 0
 )

@@ -1,6 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Reservation -->
+    <item
+        android:id="@+id/reservationFragment"
+        android:icon="@drawable/reservation"
+        android:title="Reservations"
+        android:tooltipText="Check reservations"
+        app:showAsAction="ifRoom|withText" />
     <!-- Sales Order -->
     <item
         android:id="@+id/salesOrderFragment"
@@ -9,12 +16,11 @@
         android:tooltipText="View sales orders"
         app:showAsAction="ifRoom|withText" />
 
-    <!-- Reservation -->
     <item
-        android:id="@+id/reservationFragment"
-        android:icon="@drawable/reservation"
-        android:title="Reservations"
-        android:tooltipText="Check reservations"
+        android:id="@+id/menuItemsFragment"
+        android:icon="@drawable/menufood"
+        android:title="Menu Items"
+        android:tooltipText="Manage menu items"
         app:showAsAction="ifRoom|withText" />
 
     <!-- Account -->
@@ -24,4 +30,5 @@
         android:title="My Account"
         android:tooltipText="Manage account settings"
         app:showAsAction="ifRoom|withText" />
+
 </menu>

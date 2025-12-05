@@ -1,14 +1,20 @@
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.plugin.parcelize")
+    id("com.google.devtools.ksp")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.example.restro"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.restro"
@@ -42,12 +48,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 
     buildFeatures {
@@ -73,7 +79,9 @@ dependencies {
     implementation(libs.play.services.ads.identifier)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.paging.common)
-    
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.work.runtime.ktx)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -100,7 +108,7 @@ dependencies {
 
     // Hilt dependencies
     implementation(libs.hilt.android.v2562)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     //Reflection
     implementation(libs.kotlin.reflect)
@@ -118,7 +126,8 @@ dependencies {
     //Room
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+    implementation("androidx.room:room-paging:2.8.4")
 
     //CustomActivityOnCrash
     implementation(libs.customactivityoncrash)
@@ -142,6 +151,7 @@ dependencies {
     }
     // paging 3
     implementation(libs.androidx.paging.runtime)
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
 // shimmer

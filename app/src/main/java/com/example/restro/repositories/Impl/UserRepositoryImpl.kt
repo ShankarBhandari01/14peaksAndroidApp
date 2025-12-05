@@ -1,4 +1,4 @@
-package com.example.restro.local
+package com.example.restro.repositories.Impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -9,7 +9,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.restro.base.BaseRepository
 import com.example.restro.data.model.Session
 import com.example.restro.data.model.User
-import com.example.restro.repos.OfflineStoreInterface
+import com.example.restro.local.UserDao
+import com.example.restro.repositories.UserRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -19,10 +20,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OfflineStoreImpl @Inject constructor(
+class UserRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val userDao: UserDao
-) : OfflineStoreInterface, BaseRepository() {
+) : UserRepository, BaseRepository() {
     private val FIRST_LAUNCH = booleanPreferencesKey("first_launch")
     private val USER_ID = stringPreferencesKey("user_id")
     private val SESSION = stringPreferencesKey("session")

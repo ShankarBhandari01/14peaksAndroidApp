@@ -5,14 +5,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.restro.data.model.Notification
-import com.example.restro.repos.SocketIORepository
+import com.example.restro.service.SocketIOService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    repository: SocketIORepository
+    repository: SocketIOService
 ) : ViewModel() {
 
     private val TAG = "NotificationViewModel"

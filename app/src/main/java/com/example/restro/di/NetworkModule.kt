@@ -5,8 +5,10 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.restro.BuildConfig
 import com.example.restro.di.intercepter.ApiInterceptor
 import com.example.restro.di.intercepter.ApiInterceptorQualifier
+import com.example.restro.apis.Apis
 import com.example.restro.service.ApiService
 import com.example.restro.service.TokenAuthenticator
+import com.example.restro.service.impl.ApisServicesImpl
 import com.example.restro.utils.ConstantsValues.Companion.DEV_BASE_URL
 import com.example.restro.utils.ConstantsValues.Companion.LIVE_BASE_URL
 import dagger.Module
@@ -90,7 +92,11 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+    fun provideService(retrofit: Retrofit): Apis = retrofit.create(Apis::class.java)
+
+    @Singleton
+    @Provides
+    fun providesApiService(apis: Apis): ApiService = ApisServicesImpl(apis)
 
 
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.startup.AppInitializer
+import androidx.work.Configuration
 import cat.ereza.customactivityoncrash.activity.DefaultErrorActivity
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.example.restro.BuildConfig
@@ -17,6 +18,7 @@ import timber.log.Timber
 
 @HiltAndroidApp
 class RestroApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
         initTimber()

@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
@@ -25,19 +26,26 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.Window
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
+import com.example.restro.data.model.Reservation
 import com.example.restro.databinding.DialogNotificationPopupBinding
 import com.example.restro.databinding.DialogProgressBinding
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -48,8 +56,7 @@ object Utils {
         val appProcesses = activityManager.runningAppProcesses ?: return false
         val packageName = packageName
         return appProcesses.any {
-            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
-                    it.processName == packageName
+            it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && it.processName == packageName
         }
     }
 
@@ -62,19 +69,15 @@ object Utils {
         // Create channel if Android >= O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId,
-                "Socket Messages",
-                NotificationManager.IMPORTANCE_HIGH
+                channelId, "Socket Messages", NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("New Message")
-            .setContentText(message)
-            .setSmallIcon(R.drawable.baseline_notifications_active_24)
-            .setAutoCancel(true)
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, channelId).setContentTitle("New Message")
+                .setContentText(message).setSmallIcon(R.drawable.baseline_notifications_active_24)
+                .setAutoCancel(true).build()
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
@@ -92,15 +95,13 @@ object Utils {
             } else {
                 // Fallback → ANDROID_ID
                 Settings.Secure.getString(
-                    context.contentResolver,
-                    Settings.Secure.ANDROID_ID
+                    context.contentResolver, Settings.Secure.ANDROID_ID
                 )
             }
         } catch (e: Exception) {
             // In case Google Play Services is missing or blocked
             Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ANDROID_ID
+                context.contentResolver, Settings.Secure.ANDROID_ID
             )
         }
     }
@@ -284,14 +285,10 @@ object Utils {
 
     //
     fun Context.showNotificationPopup(
-        title: String,
-        message: String,
-        onViewClick: (() -> Unit)? = null
+        title: String, message: String, onViewClick: (() -> Unit)? = null
     ) {
         val dialogView = DialogNotificationPopupBinding.inflate(LayoutInflater.from(this))
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView.root)
-            .create()
+        val dialog = AlertDialog.Builder(this).setView(dialogView.root).create()
 
         dialogView.tvNotificationTitle.text = title
         dialogView.tvNotificationMessage.text = message
@@ -307,4 +304,45 @@ object Utils {
     }
 
 
+    fun TextView.setDrawableStartClickListener(onClick: () -> Unit) {
+        this.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+
+                val drawables = this.compoundDrawablesRelative
+                val drawableStart: Drawable? = drawables[0] // start drawable
+
+                if (drawableStart != null) {
+                    val drawableWidth = drawableStart.bounds.width()
+                    val touchX = event.x.toInt()
+
+                    // If user touched within drawableStart bounds
+                    if (touchX <= paddingStart + drawableWidth) {
+                        onClick()
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
+    }
+
+    fun isNewReservation(reservation: Reservation, days: Long): Boolean {
+        return try {
+            val reserved = LocalDateTime.parse(
+                reservation.reservation_date,
+                DateTimeFormatter.ISO_DATE_TIME
+            )
+
+            val cutoff = LocalDateTime.now().minusDays(days)
+
+            reserved.isAfter(cutoff)
+        } catch (e: Exception) {
+            Timber.d(e.localizedMessage)
+            false
+        }
+    }
+
+    inline fun <reified T> String.to(): T {
+        return Gson().fromJson(this, object : TypeToken<T>() {}.type)
+    }
 }

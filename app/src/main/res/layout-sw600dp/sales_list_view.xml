@@ -1,5 +1,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -11,8 +12,6 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginVertical="6dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -23,11 +22,28 @@
         app:strokeWidth="1dp">
 
         <LinearLayout
-            android:background="@color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/white"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/_6sdp">
+
+            <LinearLayout
+                android:id="@+id/bill_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:padding="@dimen/_4sdp">
+                <!-- Order Type -->
+                <TextView
+                    android:id="@+id/order_Type"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{`Order Type: ` + sales.orderType}"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <!-- Order ID -->
             <TextView
@@ -38,7 +54,16 @@
                 android:text="@{`Order: ` + sales.orderId}"
                 android:textStyle="bold" />
 
-            <!-- Customer -->
+            <!-- Customer ID-->
+            <TextView
+                android:id="@+id/customerId"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{`Customer Id: ` + sales.customer._id}" />
+
+            <!-- Customer-->
             <TextView
                 android:id="@+id/customerName"
                 style="@style/TextAppearance.MaterialComponents.Body2"
@@ -47,34 +72,170 @@
                 android:layout_marginTop="4dp"
                 android:text="@{`Customer: ` + sales.customer.name}" />
 
-            <!-- Date & Amount Row -->
+            <!-- Email -->
+            <TextView
+                android:id="@+id/tv_email"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Email: ` + sales.customer.email}" />
+
+            <!-- phone -->
+            <TextView
+                android:id="@+id/tv_phone"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Phone: ` + sales.customer.phone}" />
+
+            <!-- address -->
+            <TextView
+                android:id="@+id/tv_address"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{`Address: ` + sales.customer.address}" />
+
+            <TextView
+                android:id="@+id/orderDate"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:formattedDate="@{sales.createdDate}" />
+
+            <!-- Orders items -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:padding="@dimen/_5sdp"
-                android:weightSum="2">
+                android:layout_marginTop="@dimen/_8sdp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/orderDate"
-                    style="@style/TextAppearance.MaterialComponents.Caption"
-                    android:layout_width="0dp"
+                    android:id="@+id/orderItemsDetails"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="@dimen/_4sdp"
-                    android:text="@{`Date: ` + sales.updated_ts}" />
-
-                <TextView
-                    android:id="@+id/orderAmount"
-                    style="@style/TextAppearance.MaterialComponents.Body1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:text="@{`Total: $` + sales.totalAmount}"
+                    android:text="Order Items Details"
                     android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_sales_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    tools:listitem="@layout/item_sales_item" />
+
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_amount_calculation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <!-- Subtotal Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sub Total:" />
+
+                    <TextView
+                        android:id="@+id/subtotal"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.subtotal}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- VAT % Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="VAT:" />
+
+                    <TextView
+                        android:id="@+id/vatPercent"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{sales.vatPercent + `%`}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- VAT Amount Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="VAT Amount:" />
+
+                    <TextView
+                        android:id="@+id/vatAmount"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.vatAmount}"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Total Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total:"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/orderAmount"
+                        style="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`€` + sales.totalAmount}"
+                        android:textColor="@color/gray"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <!-- Order Status as Chip -->
             <com.google.android.material.chip.Chip
@@ -84,45 +245,13 @@
                 android:layout_height="wrap_content"
                 android:text="@{sales.status}"
                 android:textColor="@android:color/white"
-                app:chipBackgroundColor="@color/secondaryVariant"
+                app:chipBackgroundColor="@android:color/holo_green_light"
                 app:chipCornerRadius="8dp" />
 
             <!-- Action Buttons -->
-            <LinearLayout
+            <include
                 android:id="@+id/ll_change_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                android:weightSum="2">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_accept"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="Accept"
-                    android:textColor="@android:color/white"
-                    app:backgroundTint="@android:color/holo_green_dark"
-                    app:cornerRadius="12dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_reject"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="Reject"
-                    android:textColor="@android:color/white"
-                    app:backgroundTint="@android:color/holo_red_dark"
-                    app:cornerRadius="12dp" />
-
-            </LinearLayout>
+                layout="@layout/layout_action_buttons" />
 
         </LinearLayout>
 
