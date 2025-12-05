@@ -46,6 +46,9 @@
         app:tabSelectedTextColor="@color/black"
         app:tabTextColor="@color/gray" />
 
+
+
+
     <!-- Chip Group -->
     <HorizontalScrollView
         android:id="@+id/filterScroll"
@@ -70,6 +73,7 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:scrollbars="vertical"
+        android:nestedScrollingEnabled="true"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

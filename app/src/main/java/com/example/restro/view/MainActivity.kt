@@ -187,6 +187,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val socketDialogReceiver = object : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onReceive(context: Context?, intent: Intent?) {
             val notification =
                 intent?.getSerializableExtra("notification", SocketNotification::class.java)

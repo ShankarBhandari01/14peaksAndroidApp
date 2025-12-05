@@ -4,6 +4,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.room.withTransaction
 import com.example.restro.service.ApiService
 import com.example.restro.base.BaseRepository
 import com.example.restro.data.model.RemoteKeys
@@ -99,14 +100,17 @@ class RoomRepositoryImpl @Inject constructor(
                     position = 0
                 )
 
-                // insert into room database
-                db.saleReservationDao().upsertReservation(newReservationWithPosition!!)
-                // insert keys
-                db.remoteKeysDao().insertAll(listOf(key))
+                db.withTransaction {
+                    // insert into room database
+                    db.saleReservationDao().upsertReservation(newReservationWithPosition!!)
+                    // insert keys
+                    db.remoteKeysDao().insertAll(listOf(key))
 
-                // Shift all other positions down by 1
-                db.saleReservationDao().incrementAllPositions()
+                    // Shift all other positions down by 1
+                    db.saleReservationDao().incrementAllPositions()
+                }
             }
+
         }
 
 

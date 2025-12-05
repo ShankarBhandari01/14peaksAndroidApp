@@ -79,6 +79,8 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:paddingBottom="?attr/actionBarSize"
         app:defaultNavHost="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:navGraph="@navigation/bottom_nav_graph" />
@@ -94,6 +96,7 @@
         app:itemRippleColor="@color/gray"
         app:itemTextColor="@color/bottom_nav_selector"
         app:labelVisibilityMode="labeled"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         app:menu="@menu/bottom_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

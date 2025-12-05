@@ -87,11 +87,11 @@ class SocketIOServiceImpl @Inject constructor(
         }
 
         socket = IO.socket(
-            if (BuildConfig.DEBUG) ConstantsValues.Companion.DEV_WEB_SOCKET_URL else ConstantsValues.Companion.WEB_SOCKET_URL,
+            if (BuildConfig.DEBUG) ConstantsValues.DEV_WEB_SOCKET_URL else ConstantsValues.WEB_SOCKET_URL,
             opts
         ).apply {
             on(Socket.EVENT_CONNECT) {
-                Timber.Forest.tag("SocketIO").d("Connected: %s (userId=%s)", id(), userId)
+                Timber.tag("SocketIO").d("Connected: %s (userId=%s)", id(), userId)
                 _isConnected.value = true
 
                 val userJson = JSONObject().apply { put("userId", userId) }
@@ -100,7 +100,7 @@ class SocketIOServiceImpl @Inject constructor(
             }
 
             on(Socket.EVENT_DISCONNECT) {
-                Timber.Forest.tag("SocketIO").w(" Disconnected")
+                Timber.tag("SocketIO").w(" Disconnected")
                 _isConnected.value = false
             }
 
@@ -110,10 +110,10 @@ class SocketIOServiceImpl @Inject constructor(
 
             on("notification") { args ->
                 if (args.isNotEmpty()) {
-                    ConstantsValues.Companion.supervisedScope.launch {
+                    ConstantsValues.supervisedScope.launch {
                         val raw = args.firstOrNull()?.toString() ?: return@launch
                         runCatching {
-                            Timber.Forest.d(raw)
+                            Timber.d(raw)
 
                             val notification: SocketNotification<Any> =
                                 raw.to<SocketNotification<Any>>()
@@ -123,7 +123,7 @@ class SocketIOServiceImpl @Inject constructor(
                             _messages.emit(notification)
 
                         }.onFailure {
-                            Timber.Forest.tag("SocketIO").e(it, "Failed to emit socket message")
+                            Timber.tag("SocketIO").e(it, "Failed to emit socket message")
                         }
                     }
                 }

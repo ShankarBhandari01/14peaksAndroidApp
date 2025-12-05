@@ -49,6 +49,7 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        dialog.setCancelable(false)
         binding.btnClose.setOnClickListener {
             dialog.dismiss()
         }

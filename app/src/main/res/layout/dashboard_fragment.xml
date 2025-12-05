@@ -74,12 +74,13 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Content -->
-
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/dashboard_nav_host"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:fitsSystemWindows="true"
+            android:paddingBottom="?attr/actionBarSize"
             app:defaultNavHost="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:navGraph="@navigation/bottom_nav_graph" />
@@ -90,6 +91,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         android:background="?attr/colorSurface"
         app:itemIconTint="@color/bottom_nav_selector"
         app:itemRippleColor="@color/primaryColor"

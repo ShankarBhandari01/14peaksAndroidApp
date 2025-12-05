@@ -15,6 +15,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DbModule {
+
+    @Synchronized
     @Provides
     @Singleton
     fun provide(@ApplicationContext context: Context) = Room.databaseBuilder(
@@ -33,7 +35,6 @@ object DbModule {
     @Provides
     @Singleton
     fun providesSaleDao(db: OfflineDatabase) = db.saleReservationDao()
-
 
 
 }

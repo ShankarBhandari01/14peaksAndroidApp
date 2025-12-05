@@ -54,12 +54,10 @@ class ReservationRemoteMediator(
                         }
                     }
 
-                    val remoteKey = getRemoteKeyForLastItem(state)
+                    val remoteKey = getRemoteKeyForLastItem(state) ?: return MediatorResult.Success(
+                        endOfPaginationReached = true
+                    )
 
-
-                    if (remoteKey == null) {
-                        return MediatorResult.Success(endOfPaginationReached = true)
-                    }
 
                     if (remoteKey.nextKey == null) {
                         return MediatorResult.Success(endOfPaginationReached = true)
