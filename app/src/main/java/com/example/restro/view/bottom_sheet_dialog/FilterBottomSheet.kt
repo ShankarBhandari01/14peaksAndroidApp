@@ -1,42 +1,53 @@
 package com.example.restro.view.bottom_sheet_dialog
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.restro.data.model.FilterOption
 import com.example.restro.databinding.BottomsheetFiltersBinding
 import com.example.restro.view.adapters.FilterAdapter
+import com.example.restro.viewmodel.SalesViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.any
+import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 import timber.log.Timber
+import kotlin.getValue
 
 @AndroidEntryPoint
-class FilterBottomSheet : BottomSheetDialogFragment() {
+class FilterBottomSheet(private var inputFilters: Set<FilterOption>) : BottomSheetDialogFragment() {
 
     private var _binding: BottomsheetFiltersBinding? = null
     private val binding get() = _binding!!
-    lateinit var adapter: FilterAdapter
-    private var selectedFilters = mutableListOf<FilterOption>()
-    private val filters = mutableListOf<FilterOption>()
-    lateinit var dialog: BottomSheetDialog
-    var onFiltersApplied: ((List<FilterOption>) -> Unit)? = null
+
+
+    private val viewModel by viewModels<SalesViewModel>(
+        ownerProducer = { requireParentFragment() })
+    private val filters = mutableSetOf<FilterOption>()
+
+    var onFiltersApplied: (() -> Unit)? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = BottomsheetFiltersBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
         dialog.setOnShowListener {
             val bottomSheet =
@@ -49,33 +60,45 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        dialog.setCancelable(false)
-        binding.btnClose.setOnClickListener {
-            dialog.dismiss()
-        }
-
         return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
         loadDynamicFilters()
-
+        setupRecyclerView()
 
         binding.btnApplyFilters.setOnClickListener {
-            onFiltersApplied?.invoke(selectedFilters)
+            onFiltersApplied?.invoke()
+            dismiss()
+        }
+
+        binding.btnClose.setOnClickListener {
             dismiss()
         }
     }
 
     private fun setupRecyclerView() {
-        adapter = FilterAdapter(filters) { selectedFilter ->
-            Timber.tag("Filter").d("${selectedFilter.name} = ${selectedFilter.isSelected}")
-            selectedFilters.add(selectedFilter)
+
+        val adapter = FilterAdapter(filters) { selectedFilter ->
+            viewModel.addFilters(selectedFilter)
         }
+
         binding.rvFilters.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFilters.adapter = adapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedFilters.collect { items ->
+
+                    filters.forEach { item ->
+                        item.isSelected = items.any { it.id == item.id }
+                    }
+
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
 
     private fun loadDynamicFilters() {
@@ -87,7 +110,6 @@ class FilterBottomSheet : BottomSheetDialogFragment() {
         )
         filters.clear()
         filters.addAll(dynamicFilters)
-        adapter.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {

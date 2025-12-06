@@ -7,7 +7,7 @@ import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.restro.R
-import com.example.restro.utils.Utils
+import com.example.restro.utils.Utilities
 
 class LoadingStateAdapter(private val retry: () -> Unit) :
     LoadStateAdapter<LoadingStateAdapter.LoadingViewHolder>() {
@@ -16,7 +16,7 @@ class LoadingStateAdapter(private val retry: () -> Unit) :
 
     override fun onBindViewHolder(holder: LoadingViewHolder, loadState: LoadState) {
         if (loadState is LoadState.Error) {
-            Utils.showAlertDialog(
+            Utilities.showAlertDialog(
                 message = loadState.error.localizedMessage,
                 context = holder.itemView.context
             )

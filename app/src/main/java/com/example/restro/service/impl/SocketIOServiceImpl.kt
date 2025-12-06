@@ -13,7 +13,7 @@ import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.ApiService
 import com.example.restro.service.SocketIOService
 import com.example.restro.utils.ConstantsValues
-import com.example.restro.utils.Utils.to
+import com.example.restro.utils.Utilities.to
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.Flow

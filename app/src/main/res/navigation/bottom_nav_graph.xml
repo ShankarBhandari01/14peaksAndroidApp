@@ -8,24 +8,24 @@
     <fragment
         android:id="@+id/reservationFragment"
         tools:layout="@layout/fragment_reservation"
-        android:name="com.example.restro.view.ReservationFragment"
+        android:name="com.example.restro.view.reservations.ReservationFragment"
         android:label="Reservations" />
 
     <fragment
         android:id="@+id/salesOrderFragment"
         tools:layout="@layout/fragment_sales_order"
-        android:name="com.example.restro.view.SalesOrderFragment"
+        android:name="com.example.restro.view.orders.SalesOrderFragment"
         android:label="Orders" />
 
     <fragment
         android:id="@+id/menuItemsFragment"
         tools:layout="@layout/fragment_menu_items_fragments"
-        android:name="com.example.restro.view.MenuItemsFragments"
+        android:name="com.example.restro.view.menus.MenuItemsFragments"
         android:label="Menu Items" />
 
     <fragment
         android:id="@+id/accountFragment"
         tools:layout="@layout/fragment_account"
-        android:name="com.example.restro.view.AccountFragment"
+        android:name="com.example.restro.view.company.AccountFragment"
         android:label="Account" />
 </navigation>

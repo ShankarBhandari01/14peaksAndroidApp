@@ -16,7 +16,7 @@
         android:fillViewport="false"
         android:isScrollContainer="true"
         android:fitsSystemWindows="false"
-        tools:context=".view.LoginFragment">
+        tools:context=".view.login.LoginFragment">
 
         <androidx.cardview.widget.CardView
             android:layout_gravity="center"

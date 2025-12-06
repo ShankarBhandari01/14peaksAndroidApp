@@ -1,10 +1,10 @@
-package com.example.restro.view
+package com.example.restro.view.company
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.restro.R
 import com.example.restro.databinding.FragmentEditCompanyInfoBinding
 import dagger.hilt.android.AndroidEntryPoint

@@ -4,13 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.startup.AppInitializer
-import androidx.work.Configuration
 import cat.ereza.customactivityoncrash.activity.DefaultErrorActivity
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.example.restro.BuildConfig
 import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.ConstantsValues.Companion.supervisedScope
-import com.example.restro.utils.Utils
+import com.example.restro.utils.Utilities
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import net.danlew.android.joda.JodaTimeInitializer
@@ -29,7 +28,7 @@ class RestroApplication : Application() {
         supervisedScope.launch {
             val deviceInfo = ConstantsValues.deviceInfo
             deviceInfo.platform = "android"
-            deviceInfo.deviceId = Utils.extractDeviceId(this@RestroApplication)
+            deviceInfo.deviceId = Utilities.extractDeviceId(this@RestroApplication)
         }
 
         registerActivityLifecycleCallbacks(AppLifecycleTracker)

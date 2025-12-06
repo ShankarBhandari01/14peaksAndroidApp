@@ -2,8 +2,8 @@ package com.example.restro.view.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.restro.view.CategoryAddFragment
-import com.example.restro.view.MenuItemAddFragment
+import com.example.restro.view.menus.CategoryAddFragment
+import com.example.restro.view.menus.MenuItemAddFragment
 
 class MenuTabsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

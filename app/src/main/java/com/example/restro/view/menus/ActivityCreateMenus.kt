@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.menus
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

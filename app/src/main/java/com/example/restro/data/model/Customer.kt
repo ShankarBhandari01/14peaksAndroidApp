@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(
     tableName = "customer",
@@ -22,4 +23,4 @@ data class Customer(
     val name: String,
     val phone: String,
     val updated_ts: String
-)
+): Serializable

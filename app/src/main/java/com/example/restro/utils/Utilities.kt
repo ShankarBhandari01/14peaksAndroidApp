@@ -49,7 +49,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-object Utils {
+object Utilities {
 
     fun Context.isAppInForeground(): Boolean {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

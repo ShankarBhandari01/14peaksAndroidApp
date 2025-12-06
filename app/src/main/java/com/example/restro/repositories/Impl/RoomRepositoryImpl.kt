@@ -7,7 +7,7 @@ import androidx.paging.PagingData
 import androidx.room.withTransaction
 import com.example.restro.service.ApiService
 import com.example.restro.base.BaseRepository
-import com.example.restro.data.model.RemoteKeys
+import com.example.restro.data.model.PaginationState
 import com.example.restro.data.model.Reservation
 import com.example.restro.data.model.Sales
 import com.example.restro.data.model.SalesWithDetails
@@ -17,10 +17,12 @@ import com.example.restro.local.OfflineDatabase
 import com.example.restro.local.ReservationRemoteMediator
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.utils.ConstantsValues
-import com.example.restro.utils.Utils.to
+import com.example.restro.utils.Utilities.to
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @ActivityRetainedScoped
@@ -43,10 +45,16 @@ class RoomRepositoryImpl @Inject constructor(
             }).flow
     }
 
+    private fun cutoffDate(days: Long): String {
+        return LocalDateTime.now().minusDays(days).format(DateTimeFormatter.ISO_DATE_TIME)
+    }
 
     override fun getAllReservation(
-        limit: Int
+        limit: Int, filterDays: Long, type: String
     ): Flow<PagingData<Reservation>> {
+
+        val cutoff = cutoffDate(filterDays)
+
         return Pager(
             config = PagingConfig(
                 pageSize = limit,
@@ -58,8 +66,8 @@ class RoomRepositoryImpl @Inject constructor(
         ) {
             db.saleReservationDao().getReservationPaging()
         }.flow
-
     }
+
 
     override suspend fun syncDataSalesReservation(
         data: String, notification: SocketNotification<Any>
@@ -87,28 +95,9 @@ class RoomRepositoryImpl @Inject constructor(
                 val reservationNotification: SocketNotification<Reservation> =
                     data.to<SocketNotification<Reservation>>()
 
-                val reservation: Reservation? = reservationNotification.data
+                val reservation = reservationNotification.data
 
-                val newReservationWithPosition = reservation?.copy(
-                    pagePosition = 0  // Put at the top
-                )
-                // Add RemoteKey for this item
-                val key = RemoteKeys(
-                    id = reservation?._id!!,
-                    prevKey = null,
-                    nextKey = null,  // Not part of pagination
-                    position = 0
-                )
-
-                db.withTransaction {
-                    // insert into room database
-                    db.saleReservationDao().upsertReservation(newReservationWithPosition!!)
-                    // insert keys
-                    db.remoteKeysDao().insertAll(listOf(key))
-
-                    // Shift all other positions down by 1
-                    db.saleReservationDao().incrementAllPositions()
-                }
+                db.saleReservationDao().upsertReservation(reservation!!)
             }
 
         }
