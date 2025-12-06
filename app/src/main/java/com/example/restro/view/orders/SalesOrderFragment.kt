@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.orders
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.paging.filter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +29,6 @@ import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
@@ -65,14 +63,12 @@ class SalesOrderFragment : Fragment(R.layout.fragment_sales_order) {
     }
 
     private fun setupFilterBottomSheet() {
-        val bottomSheet = FilterBottomSheet()
+        val bottomSheet = FilterBottomSheet(emptySet())
         bottomSheet.isCancelable = false
 
         binding.iconFilterButton.setOnClickListener {
 
-            bottomSheet.onFiltersApplied = { selectedFilters ->
-                activeFilters.clear()
-                activeFilters.addAll(selectedFilters)
+            bottomSheet.onFiltersApplied = {
 
                 showAppliedFilters(activeFilters)
                 viewModel.loadSalesOrders(sort = "asc")

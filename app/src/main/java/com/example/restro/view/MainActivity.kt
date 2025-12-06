@@ -12,7 +12,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -25,9 +24,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.SocketNotification
 import com.example.restro.databinding.ActivityMainBinding
-import com.example.restro.utils.Utils.showNotificationPopup
-import com.example.restro.viewmodel.SalesViewModel
-import com.example.restro.viewmodel.UserViewModel
+import com.example.restro.utils.Utilities.showNotificationPopup
+import com.example.restro.view.notification.NotificationDetailsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,8 +44,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -57,13 +55,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
+            this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     showExitConfirmationDialog()
                 }
-            }
-        )
+            })
         if (!hasAllPermissions(
                 listOf(
                     Manifest.permission.POST_NOTIFICATIONS,
@@ -88,8 +84,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
@@ -98,12 +94,12 @@ class MainActivity : AppCompatActivity() {
         val requiredPermissions = mutableListOf<String>()
 
         // Notifications (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            requiredPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) requiredPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
 
         // Full-screen intent (Android 14+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-            requiredPermissions.add(Manifest.permission.USE_FULL_SCREEN_INTENT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) requiredPermissions.add(
+            Manifest.permission.USE_FULL_SCREEN_INTENT
+        )
 
         // Add any additional permissions your app needs
         requiredPermissions.addAll(
@@ -121,9 +117,7 @@ class MainActivity : AppCompatActivity() {
 
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(
-                this,
-                permissionsToRequest.toTypedArray(),
-                1001
+                this, permissionsToRequest.toTypedArray(), 1001
             )
         }
     }
@@ -136,9 +130,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -147,10 +139,10 @@ class MainActivity : AppCompatActivity() {
             val grantedPermissions = mutableListOf<String>()
 
             permissions.forEachIndexed { index, permission ->
-                if (grantResults[index] == PackageManager.PERMISSION_GRANTED)
-                    grantedPermissions.add(permission)
-                else
-                    deniedPermissions.add(permission)
+                if (grantResults[index] == PackageManager.PERMISSION_GRANTED) grantedPermissions.add(
+                    permission
+                )
+                else deniedPermissions.add(permission)
             }
 
             when {
@@ -175,15 +167,11 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun showExitConfirmationDialog() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Exit App")
-            .setMessage("Are you sure you want to exit?")
-            .setPositiveButton("Exit") { dialog, _ ->
+        MaterialAlertDialogBuilder(this).setTitle("Exit App")
+            .setMessage("Are you sure you want to exit?").setPositiveButton("Exit") { dialog, _ ->
                 dialog.dismiss()
                 finishAffinity()
-            }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-            .show()
+            }.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }.show()
     }
 
     private val socketDialogReceiver = object : BroadcastReceiver() {
@@ -195,7 +183,12 @@ class MainActivity : AppCompatActivity() {
             Timber.d("Message:${Gson().toJson(notification)}")
 
             showNotificationPopup(notification?.title!!, notification.body!!) {
-                startActivity(Intent(this@MainActivity, NotificationDetailsActivity::class.java))
+                startActivity(
+                    Intent(
+                        this@MainActivity, NotificationDetailsActivity::class.java
+                    ).apply {
+                        putExtra("notification", notification)
+                    })
             }
         }
     }

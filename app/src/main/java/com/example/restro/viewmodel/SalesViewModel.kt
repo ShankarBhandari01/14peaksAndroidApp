@@ -7,17 +7,21 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter
-import androidx.paging.map
 import com.example.restro.base.BaseViewmodel
+import com.example.restro.data.model.FilterOption
 import com.example.restro.data.model.Reservation
 import com.example.restro.data.model.Sales
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.utils.UiEvent
-import com.example.restro.utils.Utils
+import com.example.restro.utils.Utilities
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,20 +32,22 @@ class SalesViewModel @Inject constructor(
 ) : BaseViewmodel(application) {
 
 
+    private val _selectedFilters = MutableStateFlow<Set<FilterOption>>(mutableSetOf())
+
+    val selectedFilters: Flow<Set<FilterOption>> = _selectedFilters
+
     private val _uiEvents = MutableLiveData<UiEvent>()
     val uiEvents: LiveData<UiEvent> = _uiEvents
+
     private val _salesPagingData = MutableSharedFlow<PagingData<Sales>>(replay = 1)
     val salesPagingData: Flow<PagingData<Sales>> = _salesPagingData
 
-    private val _reservationData = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
+    private val _reservationType = MutableStateFlow("new") // default
+    val reservationType = _reservationType.asStateFlow()
 
-    val reservationData: Flow<PagingData<Reservation>> = _reservationData
-
-    private val _newReservation = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
-    val newReservation: Flow<PagingData<Reservation>> = _newReservation
-
-    private val _oldReservation = MutableSharedFlow<PagingData<Reservation>>(replay = 1)
-    val oldReservation: Flow<PagingData<Reservation>> = _oldReservation
+    fun setReservationType(type: String) {
+        _reservationType.value = type
+    }
 
     fun loadSalesOrders(sort: String = "desc") {
         viewModelScope.launch {
@@ -53,31 +59,33 @@ class SalesViewModel @Inject constructor(
         }
     }
 
-    fun loadReservations() {
-        viewModelScope.launch {
-            repository.getAllReservation(10)
-                .cachedIn(viewModelScope)
-                .collectLatest { pagingData ->
-                    _reservationData.emit(pagingData)
-                }
+
+    val reservations = reservationType
+        .flatMapLatest { type ->
+            repository.getAllReservation(10, 5, type)
         }
-    }
+        .cachedIn(viewModelScope)
 
-    fun observeReservations() {
+
+    fun addFilters(filters: FilterOption) {
         viewModelScope.launch {
-            reservationData.collectLatest { pagingData ->
-
-                val newData = pagingData.filter { res ->
-                    Utils.isNewReservation(res, 5)
+            _selectedFilters.value = _selectedFilters.value.toMutableSet().apply {
+                if (filters.isSelected) {
+                    if (contains(filters)) remove(filters) else add(filters)
+                } else {
+                    remove(filters)
                 }
-
-                val oldData = pagingData.filter { res ->
-                    !Utils.isNewReservation(res, 5)
-                }
-
-                _newReservation.emit(newData)
-                _oldReservation.emit(oldData)
             }
         }
     }
+
+    fun removeFilters(filters: FilterOption) {
+        viewModelScope.launch {
+            _selectedFilters.value = _selectedFilters.value.toMutableSet().apply {
+                if (contains(filters)) remove(filters)
+            }
+        }
+    }
+
+
 }

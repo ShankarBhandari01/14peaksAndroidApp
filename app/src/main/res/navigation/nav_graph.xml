@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.restro.view.LoginFragment"
+        android:name="com.example.restro.view.login.LoginFragment"
         android:label="@string/login_fragment_label"
         tools:layout="@layout/login_fragment">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
-        android:name="com.example.restro.view.DashboardFragment"
+        android:name="com.example.restro.view.dashboard.DashboardFragment"
         android:label="@string/dashboard_fragment_label"
         tools:layout="@layout/dashboard_fragment">
 

@@ -23,13 +23,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
-            android:name=".view.ActivityCreateMenus"
+            android:name=".view.menus.ActivityCreateMenus"
             android:exported="false" />
         <activity
-            android:name=".view.NotificationDetailsActivity"
+            android:name=".view.notification.NotificationDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".view.NotificationActivity"
+            android:name=".view.notification.NotificationActivity"
             android:exported="false"
             android:theme="@style/NotificationActivityAnimation"
             android:windowSoftInputMode="adjustPan|stateAlwaysVisible" />

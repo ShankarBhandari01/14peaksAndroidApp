@@ -1,15 +1,13 @@
-package com.example.restro.view
+package com.example.restro.view.menus
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.Fragment
 import com.example.restro.R
 import com.example.restro.databinding.FragmentMenuItemsFragmentsBinding
 import com.example.restro.view.adapters.MenuTabsAdapter
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,6 +39,10 @@ class MenuItemsFragments : Fragment(R.layout.fragment_menu_items_fragments) {
     ): View {
         _binding = FragmentMenuItemsFragmentsBinding.inflate(layoutInflater, container, false)
         return binding.root
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

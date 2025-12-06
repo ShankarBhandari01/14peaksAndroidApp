@@ -35,8 +35,9 @@ interface SaleReservationDao {
 
 
     @Transaction
-    @Query("SELECT * FROM reservation_table ORDER BY pagePosition ASC")
+    @Query("SELECT * FROM reservation_table ORDER BY reservation_date ASC")
     fun getReservationPaging(): PagingSource<Int, Reservation>
+
 
     // ------------------- INSERT -------------------
     @Upsert
@@ -104,15 +105,10 @@ interface SaleReservationDao {
 
     // ------------------- RESERVATION QUERY -------------------
 
-    @Query("SELECT MAX(pagePosition) FROM reservation_table")
-    suspend fun getMaxPosition(): Int?
-
-    @Query("UPDATE reservation_table SET pagePosition = pagePosition + 1")
-    suspend fun incrementAllPositions()
-
     @Query("SELECT COUNT(*) FROM reservation_table")
     suspend fun getCount(): Int
 
+    @Transaction
     @Upsert
     suspend fun upsertReservation(reservation: Reservation)
 

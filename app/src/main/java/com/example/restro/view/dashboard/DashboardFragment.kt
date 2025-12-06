@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.dashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
+import com.example.restro.view.notification.NotificationActivity
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +52,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
 
         binding.imgNotificationBtn.setOnClickListener {
-            val intent = NotificationActivity.getIntent(requireContext())
+            val intent = NotificationActivity.Companion.getIntent(requireContext())
             startActivity(intent)
         }
     }

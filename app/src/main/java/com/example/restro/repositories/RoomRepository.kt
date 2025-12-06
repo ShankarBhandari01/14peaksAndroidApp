@@ -14,7 +14,9 @@ interface RoomRepository {
     ): Flow<PagingData<Sales>>
 
     fun getAllReservation(
-        limit: Int = 10
+        limit: Int = 10,
+        filterDays: Long,
+        type: String
     ): Flow<PagingData<Reservation>>
 
     suspend fun syncDataSalesReservation(data: String, notification: SocketNotification<Any>)

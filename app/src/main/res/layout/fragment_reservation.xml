@@ -5,25 +5,45 @@
     android:layout_height="match_parent"
     android:padding="@dimen/_10sdp">
 
-    <!-- Top Row -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/titleText"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:text="Reservation"
             android:textSize="@dimen/_14ssp"
             android:textStyle="bold" />
 
+        <!-- Spacer -->
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <!-- Search Bar -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@drawable/search_background"
+            android:iconifiedByDefault="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:queryHint="Search..." />
+
+        <!-- Filter Icon -->
         <ImageButton
             android:id="@+id/iconFilterButton"
             android:layout_width="wrap_content"
@@ -31,6 +51,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/_6sdp"
             android:src="@drawable/baseline_filter_list_24" />
+
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
@@ -51,6 +72,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@id/viewPager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reservationTabLayout">
@@ -62,18 +84,10 @@
             app:chipSpacing="8dp" />
     </HorizontalScrollView>
 
-    <!-- RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/reservationRecyclerView"
-        android:layout_width="0dp"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        android:nestedScrollingEnabled="true"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterScroll"
-        tools:listitem="@layout/reservation_item" />
+        app:layout_constraintTop_toBottomOf="@+id/reservationTabLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

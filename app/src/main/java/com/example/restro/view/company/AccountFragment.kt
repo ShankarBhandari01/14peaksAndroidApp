@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.company
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import com.example.restro.R
 import com.example.restro.databinding.FragmentAccountBinding
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.scopes.FragmentScoped
 
 @AndroidEntryPoint
 class AccountFragment : Fragment(R.layout.fragment_account) {

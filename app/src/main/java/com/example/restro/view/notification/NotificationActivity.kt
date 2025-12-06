@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.notification
 
 import android.content.Context
 import android.content.Intent
@@ -10,11 +10,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
-import com.example.restro.R
 import com.example.restro.data.model.Notification
 import com.example.restro.databinding.ActivityNotificationBinding
 import com.example.restro.databinding.NotificationLayoutBinding
-import com.example.restro.utils.Utils.setDrawableStartClickListener
+import com.example.restro.utils.Utilities.setDrawableStartClickListener
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.viewmodel.NotificationViewModel

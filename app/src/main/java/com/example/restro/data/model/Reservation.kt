@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(
     tableName = "reservation_table",
@@ -26,5 +27,4 @@ data class Reservation(
     val status: String,
     val table_id: String,
     val updated_ts: String,
-    val pagePosition: Int = 0
-)
+): Serializable

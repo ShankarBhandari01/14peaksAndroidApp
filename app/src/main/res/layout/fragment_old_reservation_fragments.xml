@@ -2,41 +2,39 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.notification.NotificationActivity">
+    tools:context=".view.reservations.OldReservationFragments">
 
-    <TextView
-        android:id="@+id/tv_notification_title"
-        android:layout_width="wrap_content"
+    <!-- Chip Group -->
+    <HorizontalScrollView
+        android:id="@+id/filterScroll"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/notification"
-        android:textStyle="bold"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:drawableStartCompat="@drawable/ic_close"
-        app:layout_constraintHorizontal_bias="0"
-        android:textAlignment="textStart"
-        android:textSize="@dimen/_14ssp"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/recyclerView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/reservationRecyclerView">
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/appliedFiltersChipGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipSpacing="8dp" />
+    </HorizontalScrollView>
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/reservationRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:padding="16dp"
-        tools:listitem="@layout/notification_layout"
+        android:nestedScrollingEnabled="true"
+        android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_notification_title"
-        />
-
+        app:layout_constraintTop_toBottomOf="@id/filterScroll"
+        tools:listitem="@layout/reservation_item" />
 </androidx.constraintlayout.widget.ConstraintLayout>

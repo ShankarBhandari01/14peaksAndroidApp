@@ -7,6 +7,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 
 @Entity(
@@ -50,4 +51,4 @@ data class ItemsData(
     val vat_percent: Int,
 
     val salesId: String,   // FK
-)
+): Serializable

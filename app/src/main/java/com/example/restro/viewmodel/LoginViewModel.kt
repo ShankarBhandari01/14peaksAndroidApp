@@ -8,12 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.restro.R
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.LoginUser
-import com.example.restro.repositories.Impl.LoginRepositoryImpl
 import com.example.restro.repositories.LoginRepository
 import com.example.restro.utils.ConstantsValues
 import com.example.restro.utils.NetWorkResult
 import com.example.restro.utils.UiEvent
-import com.example.restro.utils.Utils
+import com.example.restro.utils.Utilities
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ class LoginViewModel @Inject constructor(
             _passwordError.value = "Password is required"
             return false
         }
-        if (!Utils.isValidEmail(email.value ?: "")) {
+        if (!Utilities.isValidEmail(email.value ?: "")) {
             _emailError.value = "Invalid Email"
             return false
         }

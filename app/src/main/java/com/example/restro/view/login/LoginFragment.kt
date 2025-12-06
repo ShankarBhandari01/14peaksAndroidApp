@@ -1,4 +1,4 @@
-package com.example.restro.view
+package com.example.restro.view.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,13 +13,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.example.restro.R
 import com.example.restro.data.model.UserResponse
 import com.example.restro.databinding.LoginFragmentBinding
 import com.example.restro.service.SocketForegroundService
 import com.example.restro.utils.UiEvent
-import com.example.restro.utils.Utils
-import com.example.restro.utils.Utils.getGreetingMessage
+import com.example.restro.utils.Utilities
+import com.example.restro.view.MainActivity
 import com.example.restro.viewmodel.LoginViewModel
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,7 +57,7 @@ class LoginFragment : Fragment() {
         }
 
         // welcome message
-        binding.welcomeText.text = getGreetingMessage()
+        binding.welcomeText.text = Utilities.getGreetingMessage()
 
         disableLoginButton()
         observeViewModel()
@@ -98,12 +99,12 @@ class LoginFragment : Fragment() {
 
         viewModel.uiEvents.observe(viewLifecycleOwner) { event ->
             when (event) {
-                is UiEvent.ShowLoading -> Utils.showProgressDialog(
+                is UiEvent.ShowLoading -> Utilities.showProgressDialog(
                     "Logging in…",
                     activity as MainActivity
                 )
 
-                is UiEvent.HideLoading -> Utils.dismissProgressDialog()
+                is UiEvent.HideLoading -> Utilities.dismissProgressDialog()
                 is UiEvent.ShowMessage -> Toast.makeText(
                     requireContext(),
                     event.message,
