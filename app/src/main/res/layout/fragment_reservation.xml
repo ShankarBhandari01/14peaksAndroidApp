@@ -63,9 +63,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:tabGravity="center"
-        app:tabIndicatorColor="@color/black"
-        app:tabSelectedTextColor="@color/black"
-        app:tabTextColor="@color/gray" />
+        app:tabIndicatorColor="@android:color/black"
+        app:tabSelectedTextColor="@android:color/black"
+        app:tabTextColor="@android:color/holo_green_light" />
     <!-- Chip Group -->
     <HorizontalScrollView
         android:id="@+id/filterScroll"

@@ -75,7 +75,7 @@ class LoginFragment : Fragment() {
 
     private fun disableLoginButton() {
         binding.loginButton.backgroundTintList =
-            ContextCompat.getColorStateList(requireContext(), R.color.gray)
+            ContextCompat.getColorStateList(requireContext(), R.color.md_theme_outline)
         binding.loginButton.isEnabled = false
     }
 
@@ -86,7 +86,7 @@ class LoginFragment : Fragment() {
             binding.loginButton.backgroundTintList =
                 ContextCompat.getColorStateList(
                     requireContext(),
-                    if (enabled) R.color.black else R.color.gray
+                    if (enabled) R.color.md_theme_scrim else R.color.md_theme_outline
                 )
         }
 

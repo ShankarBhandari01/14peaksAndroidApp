@@ -6,4 +6,9 @@
     <string name="loading">loading</string>
     <string name="sales_orders">Sales Orders</string>
     <string name="notification">Notification</string>
+    <string name="navigation_drawer_close">close</string>
+    <string name="navigation_drawer_open">open</string>
+    <string name="today">Today</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="past">Past</string>
 </resources>

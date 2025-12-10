@@ -1,6 +1,7 @@
 package com.example.restro.view.reservations
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ import com.example.restro.data.model.Reservation
 import com.example.restro.databinding.FragmentOldReservationFragmentsBinding
 import com.example.restro.databinding.ReservationItemBinding
 import com.example.restro.databinding.ReservationItemBinding.inflate
+import com.example.restro.utils.Utilities.applyGradient
 import com.example.restro.utils.setFormattedDate
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
@@ -94,42 +96,29 @@ class OldReservationFragments() :
 
                     val reservationDate =
                         LocalDate.parse(reservation.reservation_date.take(10))
-// Take only yyyy-MM-dd part if your string is ISO format "2025-12-06T12:00:21.791Z"
+                    // Take only yyyy-MM-dd part if your string is ISO format "2025-12-06T12:00:21.791Z"
 
                     val today = LocalDate.now()
                     when {
                         reservationDate.isEqual(today) -> {
                             tvStatusToday.visibility = View.VISIBLE
-                            tvStatusToday.text = "Today"
+                            tvStatusToday.text = getString(R.string.today)
+                            tvStatusToday.applyGradient(R.drawable.grad_today)
                         }
 
                         reservationDate.isAfter(today) -> {
-                            // Reservation is in the future
                             tvStatusToday.visibility = View.VISIBLE
-                            tvStatusToday.text = "Upcoming"
-                            tvStatusToday.setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.successColor
-                                )
-                            )
+                            tvStatusToday.text = getString(R.string.upcoming)
+                            tvStatusToday.applyGradient(R.drawable.grad_upcoming)
                         }
 
                         reservationDate.isBefore(today) -> {
-                            // Reservation is in the past
                             tvStatusToday.visibility = View.VISIBLE
-                            tvStatusToday.text = "Past"
-                            tvStatusToday.setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.gray
-                                )
-                            )
+                            tvStatusToday.text = getString(R.string.past)
+                            tvStatusToday.applyGradient(R.drawable.grad_past)
                         }
 
-                        else -> {
-                            tvStatusToday.visibility = View.GONE
-                        }
+                        else -> tvStatusToday.visibility = View.GONE
                     }
 
 
@@ -144,20 +133,20 @@ class OldReservationFragments() :
                     val statusColor = when (reservation.status.lowercase()) {
                         "confirmed" -> ContextCompat.getColor(
                             root.context,
-                            R.color.successColor
+                            R.color.md_theme_onPrimaryContainer
                         )
 
                         "pending" -> ContextCompat.getColor(
                             root.context,
-                            R.color.warningColor
+                            R.color.md_theme_errorContainer_mediumContrast
                         )
 
                         "cancelled" -> ContextCompat.getColor(
                             root.context,
-                            R.color.errorColor
+                            R.color.md_theme_error
                         )
 
-                        else -> ContextCompat.getColor(root.context, R.color.primaryColor)
+                        else -> ContextCompat.getColor(root.context, R.color.md_theme_onPrimaryContainer)
                     }
                     (tvStatus.background as GradientDrawable).setColor(statusColor)
                     tvStatus.text = reservation.status
@@ -202,7 +191,6 @@ class OldReservationFragments() :
                     .show()
             }
         }
-
 
         // handles the version of data
         reservationJob = lifecycleScope.launch {

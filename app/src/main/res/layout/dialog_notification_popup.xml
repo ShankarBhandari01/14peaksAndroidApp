@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
     android:background="@drawable/bg_notification_popup"
     android:elevation="8dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <!-- Header Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingBottom="8dp">
 
         <ImageView
             android:id="@+id/iconNotification"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/baseline_notifications_active_24"
             android:contentDescription="Notification Icon"
-            app:tint="@color/primaryColor" />
+            android:src="@drawable/baseline_notifications_active_24"
+            app:tint="@color/md_theme_onPrimaryFixedVariant" />
 
         <TextView
             android:id="@+id/tvNotificationTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:text="New Update"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_scrim_highContrast"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -40,9 +40,9 @@
             android:id="@+id/btnClose"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_close"
             android:contentDescription="Close"
-            app:tint="@color/gray" />
+            android:src="@drawable/ic_close"
+            app:tint="@color/md_theme_surfaceVariant_highContrast" />
     </LinearLayout>
 
     <!-- Message -->
@@ -50,22 +50,22 @@
         android:id="@+id/tvNotificationMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your order has been accepted!"
-        android:textColor="@color/gray"
-        android:textSize="14sp"
         android:lineSpacingExtra="2dp"
-        android:paddingBottom="8dp" />
+        android:paddingBottom="8dp"
+        android:text="Your order has been accepted!"
+        android:textColor="@color/md_theme_surfaceVariant_highContrast"
+        android:textSize="14sp" />
 
     <!-- Action Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:paddingHorizontal="24dp"
         android:text="View"
         android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:paddingHorizontal="24dp"
-        android:layout_gravity="end"
-        app:cornerRadius="12dp"
-        app:backgroundTint="@color/primaryColor" />
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/md_theme_onPrimaryFixedVariant"
+        app:cornerRadius="12dp" />
 </LinearLayout>

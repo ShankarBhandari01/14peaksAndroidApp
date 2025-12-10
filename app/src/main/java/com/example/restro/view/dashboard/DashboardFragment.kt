@@ -4,6 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
@@ -11,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
+import com.example.restro.databinding.DrawerHeaderBinding
 import com.example.restro.view.notification.NotificationActivity
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,14 +27,14 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
     private val binding get() = _binding!!
     private var user: User? = null
 
+    private lateinit var drawerToggle: ActionBarDrawerToggle
 
     // shared across multiple fragments
     private val offlineDatabaseViewModel by activityViewModels<UserViewModel>()
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = DashboardFragmentBinding.inflate(inflater, container, false)
         return binding.root
@@ -38,43 +43,76 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setBottomNavigation()
+
+        setSideNavigation()
+
+        val headerView = binding.navigationView.getHeaderView(0)
+        val headerBinding = DrawerHeaderBinding.bind(headerView)
+
         // get user from local room database
         offlineDatabaseViewModel.getUser.observe(viewLifecycleOwner) { user ->
             user ?: return@observe
             this.user = user
+            // Set text
+            headerBinding.tvUser.text = user.name
+            headerBinding.tvEmail.text = user.email
         }
-
-        savedInstanceState?.let {
-            binding.bottomNavigation.selectedItemId =
-                it.getInt("selectedTab", R.id.salesOrderFragment)
-        }
-
 
         binding.imgNotificationBtn.setOnClickListener {
-            val intent = NotificationActivity.Companion.getIntent(requireContext())
+            val intent = NotificationActivity.getIntent(requireContext())
             startActivity(intent)
         }
     }
 
+    private fun setSideNavigation() {
+        drawerToggle = object : ActionBarDrawerToggle(
+            requireActivity(),
+            binding.drawerLayout,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        ) {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                super.onDrawerSlide(drawerView, slideOffset)
+                binding.btnOpenDrawer.rotation = slideOffset * 90
+            }
 
-    private fun setBottomNavigation() {
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+            }
+        }
+
+        binding.drawerLayout.addDrawerListener(drawerToggle)
+        drawerToggle.syncState() // Sync initial state
+
+        binding.btnOpenDrawer.setOnClickListener {
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
+
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.dashboard_nav_host) as NavHostFragment
         val navController = navHostFragment.navController
 
-        binding.bottomNavigation.setupWithNavController(navController)
-
-        // Ensure state is restored properly
-        binding.bottomNavigation.setOnItemReselectedListener {
-            // Prevent reloading the same fragment when reSelecting
+        // NavigationView item clicks
+        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.reservationFragment -> navController.navigate(R.id.reservationFragment)
+                R.id.salesOrderFragment -> navController.navigate(R.id.salesOrderFragment)
+                R.id.menuItemsFragment -> navController.navigate(R.id.menuItemsFragment)
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            true
         }
+
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt("selectedTab", binding.bottomNavigation.selectedItemId)
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
