@@ -8,7 +8,7 @@ import com.example.restro.data.model.Session
 import com.example.restro.data.model.UserResponse
 import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.repositories.LoginRepository
-import com.example.restro.utils.NetWorkResult
+import com.example.restro.utils.UiState
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -20,13 +20,13 @@ class LoginRepositoryImpl @Inject constructor(
 ) :
     LoginRepository, BaseRepository() {
 
-    override suspend fun login(login: LoginUser): Flow<NetWorkResult<ApiWrapper<UserResponse>>> {
+    override suspend fun login(login: LoginUser): Flow<UiState<ApiWrapper<UserResponse>>> {
         return baseResponse(networkHelper.isNetworkConnected()) {
             apiService.login(login = login)
         }
     }
 
-    override suspend fun refreshToken(): Flow<NetWorkResult<ApiWrapper<Session>>> {
+    override suspend fun refreshToken(): Flow<UiState<ApiWrapper<Session>>> {
         return baseResponse(networkHelper.isNetworkConnected()) {
             apiService.refreshToken()
         }

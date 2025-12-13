@@ -18,6 +18,7 @@ import android.graphics.Shader
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.icu.text.NumberFormat
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
@@ -365,5 +366,12 @@ object Utilities {
 
         paint.shader = shader
         invalidate()
+    }
+
+
+    fun Double.toEuroFi(): String {
+        return NumberFormat
+            .getCurrencyInstance(Locale("fi", "FI"))
+            .format(this)
     }
 }

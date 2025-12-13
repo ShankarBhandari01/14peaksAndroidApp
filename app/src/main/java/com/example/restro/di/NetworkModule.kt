@@ -1,11 +1,13 @@
 package com.example.restro.di
 
 import android.content.Context
+import android.webkit.CookieManager
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.example.restro.BuildConfig
 import com.example.restro.di.intercepter.ApiInterceptor
 import com.example.restro.di.intercepter.ApiInterceptorQualifier
 import com.example.restro.apis.Apis
+import com.example.restro.di.intercepter.PersistentCookieJar
 import com.example.restro.service.ApiService
 import com.example.restro.service.TokenAuthenticator
 import com.example.restro.service.impl.ApisServicesImpl
@@ -17,7 +19,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.ConnectionPool
+import okhttp3.Cookie
+import okhttp3.CookieJar
 import okhttp3.Dispatcher
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,6 +37,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    @Provides
+    @Singleton
+    fun provideCookieJar(): CookieJar = PersistentCookieJar
 
     @Provides
     fun providesLoggingInterceptor(): HttpLoggingInterceptor {
@@ -45,6 +54,7 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideHttpClient(
+        cookie: CookieJar,
         chuckerInterceptor: ChuckerInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
         authenticator: TokenAuthenticator,
@@ -56,7 +66,8 @@ object NetworkModule {
         }
         val connectionPool = ConnectionPool(100, 30, TimeUnit.SECONDS)
 
-        return OkHttpClient.Builder()
+        val client = OkHttpClient.Builder()
+            .cookieJar(cookie)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(apiInterceptor)
             .addInterceptor(chuckerInterceptor)
@@ -68,6 +79,11 @@ object NetworkModule {
             .retryOnConnectionFailure(true)
             .authenticator(authenticator)
             .build()
+
+        CookieManager.getInstance().setAcceptCookie(true)
+        return client
+
+
     }
 
     @ApiInterceptorQualifier

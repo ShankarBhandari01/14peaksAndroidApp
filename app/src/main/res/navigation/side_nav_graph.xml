@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav_graph"
-    app:startDestination="@id/reservationFragment">
+    app:startDestination="@id/reportFragment">
+
+    <fragment
+        android:id="@+id/reportFragment"
+        tools:layout="@layout/fragment_reports_fragments"
+        android:name="com.example.restro.view.dashboard.ReportsFragments"
+        android:label="Reports"/>
 
     <fragment
         android:id="@+id/reservationFragment"

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".view.dashboard.ReportsFragments">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Summery data -->
+        <TextView
+            android:id="@+id/tv_summery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Summery"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:useDefaultMargins="true">
+
+            <!-- Count Sales -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp">
+
+                <include
+                    android:id="@+id/item_sales_layout"
+                    layout="@layout/item_count_sales" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Total Sales -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp">
+
+                <include
+                    android:id="@+id/l_total_sales_sum"
+                    layout="@layout/layout_total_sales_sum" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Total Reservations -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp">
+
+                <include
+                    android:id="@+id/l_item_total_reservations"
+                    layout="@layout/item_total_reservations" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Today's Reservations -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp">
+
+                <include
+                    android:id="@+id/l_item_today_reservations"
+                    layout="@layout/item_today_reservations" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Pending Reservations -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp">
+
+                <include
+                    android:id="@+id/l_item_pending_reservations"
+                    layout="@layout/item_pending_reservations" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+        <!-- Chart Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <!-- Chart Section -->
+            <include
+                android:id="@+id/chart_layout"
+                layout="@layout/view_chart_section" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

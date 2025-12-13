@@ -103,6 +103,7 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         // NavigationView item clicks
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.reportFragment -> navController.navigate(R.id.reportFragment)
                 R.id.reservationFragment -> navController.navigate(R.id.reservationFragment)
                 R.id.salesOrderFragment -> navController.navigate(R.id.salesOrderFragment)
                 R.id.menuItemsFragment -> navController.navigate(R.id.menuItemsFragment)
@@ -110,7 +111,6 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
     }
 
 

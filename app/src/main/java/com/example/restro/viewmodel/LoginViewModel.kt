@@ -5,16 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.restro.R
 import com.example.restro.base.BaseViewmodel
 import com.example.restro.data.model.LoginUser
 import com.example.restro.repositories.LoginRepository
-import com.example.restro.utils.ConstantsValues
-import com.example.restro.utils.NetWorkResult
-import com.example.restro.utils.UiEvent
+import com.example.restro.utils.ConstantsValues.Companion.deviceInfo
+import com.example.restro.utils.ConstantsValues.Companion.session
+import com.example.restro.utils.UiState
 import com.example.restro.utils.Utilities
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,14 +29,16 @@ class LoginViewModel @Inject constructor(
     val email = MutableLiveData<String>("shankar123@gmail.com")
     val password = MutableLiveData<String>("Shankar@12345")
 
+
+    val _LoginuiState = MutableStateFlow<UiState<Any>>(UiState.Loading)
+    val LoginuiState: StateFlow<UiState<Any>> = _LoginuiState.asStateFlow()
+
     private val _emailError = MutableLiveData<String?>()
     val emailError: LiveData<String?> = _emailError
 
     private val _passwordError = MutableLiveData<String?>()
     val passwordError: LiveData<String?> = _passwordError
 
-    private val _uiEvents = MutableLiveData<UiEvent>()
-    val uiEvents: LiveData<UiEvent> = _uiEvents
 
     val isLoginEnabled: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
         val update = {
@@ -69,13 +72,12 @@ class LoginViewModel @Inject constructor(
         }
         return true
     }
-
     private fun prepareLogin(): LoginUser {
         return LoginUser(
             email = email.value.toString(),
             password = password.value.toString(),
             fcmToken = "",
-            deviceInfo = ConstantsValues.deviceInfo
+            deviceInfo = deviceInfo
         )
     }
 
@@ -83,42 +85,36 @@ class LoginViewModel @Inject constructor(
         if (!validateData()) return
 
         viewModelScope.launch {
-            _uiEvents.value = UiEvent.ShowLoading
             try {
-                val result = repository.login(prepareLogin()).last()
-                _uiEvents.value = UiEvent.HideLoading
 
-                when (result) {
-                    is NetWorkResult.Success -> {
-                        if (result.data.type == "success") {
-                            // Save session data
-                            ConstantsValues.session.token = result.data.data.session.token
-                            ConstantsValues.session.refreshToken = result.data.data.session.refreshToken
+                repository.login(prepareLogin()).collect { state ->
+                    when (state) {
+                        is UiState.Success -> {
+                            if (state.data.type == "success") {
+                                // Save session data
+                                session.token = state.data.data.session.token
+                                session.refreshToken =
+                                    state.data.data.session.refreshToken
+                                _LoginuiState.value = UiState.Success(state.data.data)
 
-                            // Navigate to Fragment
-                            _uiEvents.value = UiEvent.Navigate(
-                                data = result.data.data,
-                                destinationId = R.id.dashboardFragment,
-                                popUpToId = R.id.loginFragment
-                            )
+                            } else {
+                                _LoginuiState.value =
+                                    UiState.Error(state.data.message)
+                            }
+                        }
+                        is UiState.Error -> _LoginuiState.value =
+                            UiState.Error(state.message ?: "Login failed")
 
-                        } else {
-                            _uiEvents.value =
-                                UiEvent.ShowMessage(result.data.message)
+                        is UiState.Loading -> {
+                            _LoginuiState.value = UiState.Loading
                         }
                     }
 
-                    is NetWorkResult.Error -> _uiEvents.value =
-                        UiEvent.ShowMessage(result.message ?: "Login failed")
-
-                    is NetWorkResult.Loading -> {}
                 }
             } catch (e: Exception) {
-                _uiEvents.value = UiEvent.HideLoading
-                _uiEvents.value = UiEvent.ShowMessage("Login failed: ${e.localizedMessage}")
+                _LoginuiState.value = UiState.Error("Login failed: ${e.localizedMessage}")
             }
         }
     }
-
 
 }

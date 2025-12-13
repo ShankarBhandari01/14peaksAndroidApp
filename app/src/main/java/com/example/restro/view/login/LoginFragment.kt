@@ -10,15 +10,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
 import com.example.restro.R
 import com.example.restro.data.model.UserResponse
 import com.example.restro.databinding.LoginFragmentBinding
 import com.example.restro.service.SocketForegroundService
-import com.example.restro.utils.UiEvent
+import com.example.restro.utils.UiState
 import com.example.restro.utils.Utilities
 import com.example.restro.view.MainActivity
 import com.example.restro.viewmodel.LoginViewModel
@@ -36,8 +37,7 @@ class LoginFragment : Fragment() {
     private val offlineViewModel by activityViewModels<UserViewModel>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = LoginFragmentBinding.inflate(inflater, container, false)
         return binding.root
@@ -79,15 +79,31 @@ class LoginFragment : Fragment() {
         binding.loginButton.isEnabled = false
     }
 
+    private fun navigateToDashboard() {
+        // navigate to dashboard
+        findNavController().navigate(
+            R.id.dashboardFragment, null, R.id.loginFragment.let { popId ->
+                NavOptions.Builder().setPopUpTo(popId, true).build()
+            })
+    }
+
+    fun startService(userId: String) {
+        // start background services
+        val intent = Intent(
+            activity as MainActivity, SocketForegroundService::class.java
+        ).apply {
+            putExtra("USER_ID", userId)
+        }
+        ContextCompat.startForegroundService(activity as MainActivity, intent)
+    }
+
     private fun observeViewModel() {
 
         viewModel.isLoginEnabled.observe(viewLifecycleOwner) { enabled ->
             binding.loginButton.isEnabled = enabled
-            binding.loginButton.backgroundTintList =
-                ContextCompat.getColorStateList(
-                    requireContext(),
-                    if (enabled) R.color.md_theme_scrim else R.color.md_theme_outline
-                )
+            binding.loginButton.backgroundTintList = ContextCompat.getColorStateList(
+                requireContext(), if (enabled) R.color.md_theme_scrim else R.color.md_theme_outline
+            )
         }
 
         viewModel.emailError.observe(viewLifecycleOwner) {
@@ -97,58 +113,43 @@ class LoginFragment : Fragment() {
             binding.passwordInputLayout.error = it
         }
 
-        viewModel.uiEvents.observe(viewLifecycleOwner) { event ->
-            when (event) {
-                is UiEvent.ShowLoading -> Utilities.showProgressDialog(
-                    "Logging in…",
-                    activity as MainActivity
-                )
-
-                is UiEvent.HideLoading -> Utilities.dismissProgressDialog()
-                is UiEvent.ShowMessage -> Toast.makeText(
-                    requireContext(),
-                    event.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                is UiEvent.Navigate -> {
-                    // save user id to local storage
-                    val userResponse = event.data as UserResponse
-                    offlineViewModel.saveUserId(userResponse.user._id!!)
-                    offlineViewModel.saveUser(userResponse.user)
-
-                    // set first launch false
-                    offlineViewModel.setFirstLaunch(false)
-
-                    // set user session
-                    offlineViewModel.saveSession(userResponse.session)
-                    // start background services
-                    val intent =
-                        Intent(
-                            activity as MainActivity,
-                            SocketForegroundService::class.java
-                        ).apply {
-                            putExtra("USER_ID", userResponse.user._id)
-                        }
-                    ContextCompat.startForegroundService(activity as MainActivity, intent)
-
-                    // navigate to dashboard
-                    event.destinationId?.let {
-                        findNavController().navigate(
-                            it,
-                            null,
-                            event.popUpToId?.let { popId ->
-                                NavOptions.Builder().setPopUpTo(popId, true).build()
-                            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.LoginuiState.collect { state ->
+                    Utilities.dismissProgressDialog()
+                    when (state) {
+                        is UiState.Loading -> Utilities.showProgressDialog(
+                            "Logging in…", activity as MainActivity
                         )
 
+                        is UiState.Error -> {
+                            Toast.makeText(
+                                requireContext(),
+                                state.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is UiState.Success -> {
+                            // save user id to local storage
+                            val userResponse = state.data as UserResponse
+                            offlineViewModel.saveUserId(userResponse.user._id)
+                            offlineViewModel.saveUser(userResponse.user)
+                            // set first launch false
+                            offlineViewModel.setFirstLaunch(false)
+                            // set user session
+                            offlineViewModel.saveSession(userResponse.session)
+                            // start service
+                            startService(userResponse.user._id)
+                            // navigate to dashboard
+                            navigateToDashboard()
+                        }
                     }
                 }
-
-                is UiEvent.NavigateToActivity -> {}
             }
-        }
 
+
+        }
     }
 
     override fun onDestroyView() {

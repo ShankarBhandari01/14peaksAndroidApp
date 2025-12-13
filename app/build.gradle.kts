@@ -28,7 +28,7 @@ android {
 
     buildTypes {
         release {
-            isDebuggable = true
+            isDebuggable = false
             isShrinkResources = false
             isMinifyEnabled = false
             proguardFiles(
@@ -37,7 +37,7 @@ android {
             )
         }
         debug {
-            isDebuggable = false
+            isDebuggable = true
             isShrinkResources = false
             isMinifyEnabled = false
 
@@ -154,6 +154,9 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-// shimmer
+    // shimmer
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // MPAndroidChart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

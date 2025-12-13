@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Reporting -->
+    <item
+        android:id="@+id/reportFragment"
+        android:icon="@drawable/reports_icon"
+        android:title="Reports"
+        android:tooltipText="Check Reports"
+        app:showAsAction="ifRoom|withText" />
+
     <!-- Reservation -->
     <item
         android:id="@+id/reservationFragment"

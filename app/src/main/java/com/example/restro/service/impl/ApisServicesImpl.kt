@@ -1,7 +1,10 @@
 package com.example.restro.service.impl
 
 import com.example.restro.apis.Apis
+import com.example.restro.data.model.ApiResponse
+import com.example.restro.data.model.ApiWrapper
 import com.example.restro.data.model.LoginUser
+import com.example.restro.data.model.Reports
 import com.example.restro.service.ApiService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,4 +34,6 @@ class ApisServicesImpl @Inject constructor(
         page: Int,
         limit: Int
     ) = apis.getAllReservation(page = page, limit = limit)
+
+    override suspend fun getAnalyseReports() = apis.getAnalyseReports()
 }
