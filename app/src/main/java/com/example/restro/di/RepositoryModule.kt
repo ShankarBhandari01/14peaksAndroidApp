@@ -7,10 +7,12 @@ import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.local.OfflineDatabase
 import com.example.restro.local.UserDao
 import com.example.restro.repositories.Impl.LoginRepositoryImpl
+import com.example.restro.repositories.Impl.ReportsRepositoryImpl
 import com.example.restro.repositories.Impl.RoomRepositoryImpl
 import com.example.restro.service.impl.SocketIOServiceImpl
 import com.example.restro.repositories.Impl.UserRepositoryImpl
 import com.example.restro.repositories.LoginRepository
+import com.example.restro.repositories.ReportsRepository
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.SocketIOService
 import com.example.restro.repositories.UserRepository
@@ -50,6 +52,15 @@ object RepositoryModule {
         networkHelper: NetworkHelper
     ): LoginRepository {
         return LoginRepositoryImpl(apiService, networkHelper)
+    }
+
+    @Provides
+    @Singleton
+    fun providesReportsRepository(
+        apiService: ApiService,
+        networkHelper: NetworkHelper
+    ): ReportsRepository {
+        return ReportsRepositoryImpl(apiService, networkHelper)
     }
 
     @Provides

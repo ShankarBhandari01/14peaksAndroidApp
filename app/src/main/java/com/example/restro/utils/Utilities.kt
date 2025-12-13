@@ -13,8 +13,12 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.icu.text.NumberFormat
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.net.ConnectivityManager
@@ -29,6 +33,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.Window
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.restro.R
@@ -344,5 +349,29 @@ object Utilities {
 
     inline fun <reified T> String.to(): T {
         return Gson().fromJson(this, object : TypeToken<T>() {}.type)
+    }
+
+    fun TextView.applyGradient(@DrawableRes gradientRes: Int) {
+        val gradientDrawable = ContextCompat.getDrawable(context, gradientRes) as GradientDrawable
+
+        val shader = gradientDrawable.colors?.let {
+            LinearGradient(
+                0f, 0f,
+                this.paint.measureText(text.toString()), this.textSize,
+                it,
+                null,
+                Shader.TileMode.CLAMP
+            )
+        }
+
+        paint.shader = shader
+        invalidate()
+    }
+
+
+    fun Double.toEuroFi(): String {
+        return NumberFormat
+            .getCurrencyInstance(Locale("fi", "FI"))
+            .format(this)
     }
 }

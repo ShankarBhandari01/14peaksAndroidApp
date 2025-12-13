@@ -28,7 +28,7 @@
 
         <!-- Spacer -->
         <Space
-            android:layout_width="28dp"
+            android:layout_width="@dimen/_140sdp"
             android:layout_height="wrap_content" />
 
         <!-- Search Bar -->
@@ -37,11 +37,8 @@
             android:layout_gravity="center_vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/search_background"
+            android:layout_weight="0.5"
             android:iconifiedByDefault="true"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
             android:queryHint="Search..." />
 
         <!-- Filter Icon -->
@@ -65,9 +62,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:tabGravity="center"
-        app:tabIndicatorColor="@color/black"
-        app:tabSelectedTextColor="@color/black"
-        app:tabTextColor="@color/gray" />
+        app:tabIndicatorColor="@android:color/black"
+        app:tabSelectedTextColor="@android:color/black"
+        app:tabTextColor="@android:color/darker_gray" />
 
     <!-- Chip Group -->
     <HorizontalScrollView

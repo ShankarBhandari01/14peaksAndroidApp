@@ -1,8 +1,7 @@
 package com.example.restro.base
 
-import com.example.restro.data.model.SocketNotification
 import com.example.restro.utils.ConstantsValues
-import com.example.restro.utils.NetWorkResult
+import com.example.restro.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,29 +14,28 @@ open class BaseRepository {
     inline fun <reified T : Any> baseResponse(
         hasInternetConnection: Boolean,
         crossinline call: suspend () -> Response<T>
-    ): Flow<NetWorkResult<T>> = flow {
+    ): Flow<UiState<T>> = flow {
         if (!hasInternetConnection) {
-            emit(NetWorkResult.Error(ConstantsValues.API_INTERNET_MESSAGE))
+            emit(UiState.Error(ConstantsValues.API_INTERNET_MESSAGE))
             return@flow
         }
-        emit(NetWorkResult.Loading)
+        emit(UiState.Loading)
         try {
             val response = call()
             val body = response.body()
             if (response.isSuccessful && body != null) {
-                emit(NetWorkResult.Success(body))
+                emit(UiState.Success(body))
             } else {
                 emit(
-                    NetWorkResult.Error(
+                    UiState.Error(
                         message = response.message(),
                         data = body
                     )
                 )
             }
         } catch (e: Exception) {
-            emit(NetWorkResult.Error(e.localizedMessage ?: "Unknown error"))
+            emit(UiState.Error(e.localizedMessage ?: "Unknown error"))
         }
     }.flowOn(Dispatchers.IO)
-
 
 }

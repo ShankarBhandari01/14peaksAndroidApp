@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Order Delivered"
-                android:textColor="@color/black"
+                android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Your order #1023 has been successfully delivered."
-                android:textColor="@color/gray"
+                android:textColor="@android:color/black"
                 android:textSize="14sp" />
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="2 hours ago"
-                android:textColor="@color/gray"
+                android:textColor="@android:color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -67,7 +67,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:src="@drawable/baseline_notifications_active_24"
-            android:tint="@color/primaryColor" />
+            app:tint="@color/material_dynamic_primary10" />
 
     </LinearLayout>
 

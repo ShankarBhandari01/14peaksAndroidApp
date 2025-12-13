@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.8"
                 android:text="John Doe"
-                android:textColor="@color/textPrimary"
+                android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -39,10 +39,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/status_background"
+                android:elevation="2dp"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="4dp"
                 android:text="Confirmed"
-                android:textColor="@color/onPrimary"
+                android:textColor="@color/md_theme_onPrimary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -50,12 +51,13 @@
                 android:id="@+id/tvStatusToday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/_2sdp"
-                android:background="@drawable/is_today_bg"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+                android:layout_marginStart="@dimen/_2sdp"
+                android:background="@drawable/bg_today"
+                android:elevation="2dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
                 android:text="Today"
-                android:textColor="@color/black"
+                android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
@@ -68,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Code: RSV12345"
-            android:textColor="@color/textSecondary"
+            android:textColor="@color/material_dynamic_secondary0"
             android:textSize="13sp" />
 
         <TextView
@@ -76,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12 Dec 2025, 7:30 PM"
-            android:textColor="@color/textSecondary"
+            android:textColor="@color/material_dynamic_secondary0"
             android:textSize="13sp" />
 
         <!-- Contact Info -->
@@ -91,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📞 +44 1234 567890"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/material_dynamic_secondary0"
                 android:textSize="13sp" />
 
             <TextView
@@ -100,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="👥 4 guests"
-                android:textColor="@color/textSecondary"
+                android:textColor="@color/material_dynamic_secondary0"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -113,7 +115,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="Special request: Window seat"
-            android:textColor="@color/textTertiary"
+            android:textColor="@color/material_dynamic_tertiary0"
             android:textSize="12sp" />
 
         <!-- Divider -->
@@ -121,7 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="@color/dividerColor" />
+            android:background="@color/md_theme_surfaceDim" />
 
         <!-- Created Date -->
         <TextView
@@ -129,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Created: 11 Dec 2025"
-            android:textColor="@color/textTertiary"
+            android:textColor="@color/md_theme_onTertiary"
             android:textSize="11sp" />
 
         <!-- Action Buttons -->

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@{items.name.en}"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
             android:textStyle="italic" />
 
         <TextView
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{`x`+items.quantity}"
-            android:textColor="@color/gray" />
+            android:textColor="@android:color/darker_gray" />
 
         <TextView
             android:id="@+id/tv_item_price"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@{`€` +items.pricePerItem}"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
             android:textStyle="bold" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@{items.special_requests}"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
             android:textStyle="italic" />
     </LinearLayout>
 </layout>

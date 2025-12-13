@@ -1,11 +1,12 @@
 package com.example.restro.view.reservations
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +19,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
 @AndroidEntryPoint
 class ReservationFragment : Fragment(R.layout.fragment_reservation) {
@@ -43,36 +43,34 @@ class ReservationFragment : Fragment(R.layout.fragment_reservation) {
         showAppliedFilters()
         setUpBottomSheetView()
         handleSearchBarview()
-
     }
 
     fun handleSearchBarview() {
-        binding.searchBar.setOnCloseListener {
+
+        val searchView = binding.searchBar
+
+        // Start collapsed (icon only)
+        searchView.onActionViewCollapsed()
+
+        // When clicked → expand with animation
+        searchView.setOnClickListener {
+            searchView.onActionViewExpanded()
+        }
+        // When closed → collapse with animation
+        searchView.setOnCloseListener {
             false
         }
-        binding.searchBar.setOnSearchClickListener {
-            val params = binding.searchBar.layoutParams
-            params.width = LinearLayout.LayoutParams.MATCH_PARENT
-            binding.searchBar.layoutParams = params
-        }
 
-
-        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        // Search events
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Called when user presses the search button
-                query?.let {
-                    filterData(it)
-                }
-                binding.searchBar.clearFocus() // hide keyboard
-
+                query?.let { filterData(it) }
+                searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Called for every character typed
-                newText?.let {
-                    filterData(it)
-                }
+                newText?.let { filterData(it) }
                 return true
             }
         })

@@ -35,7 +35,7 @@ interface SaleReservationDao {
 
 
     @Transaction
-    @Query("SELECT * FROM reservation_table ORDER BY reservation_date ASC")
+    @Query("SELECT * FROM reservation_table ORDER BY reservation_date DESC")
     fun getReservationPaging(): PagingSource<Int, Reservation>
 
 

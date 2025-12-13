@@ -68,6 +68,7 @@ class ConstantsValues {
         const val API_REFRESH_TOKEN = "token/refresh"
         const val API_NOTIFICATION = "notification"
         const val API_GET_ALL_RESERVATION = "getAllReservations"
+        const val API_ANALYSE_REPORTS = "analyse_reports"
 
 
         // Structured scope for background work

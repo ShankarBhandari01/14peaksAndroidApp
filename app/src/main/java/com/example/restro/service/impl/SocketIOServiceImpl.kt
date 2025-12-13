@@ -75,7 +75,7 @@ class SocketIOServiceImpl @Inject constructor(
     @Synchronized
     override fun connect(userId: String) {
         if (socket?.connected() == true) {
-            Timber.Forest.tag("SocketIO").d("Already connected")
+            Timber.tag("SocketIO").d("Already connected")
             return
         }
 
