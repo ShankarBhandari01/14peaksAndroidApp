@@ -2,6 +2,7 @@ package com.example.restro.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.restro.BuildConfig
 import com.example.restro.data.model.User
 import com.example.restro.local.OfflineDatabase
 import com.example.restro.utils.ConstantsValues.Companion.OFFLINE_DATABASE
@@ -16,21 +17,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DbModule {
 
-    @Synchronized
     @Provides
     @Singleton
     fun provide(@ApplicationContext context: Context) = Room.databaseBuilder(
         context, OfflineDatabase::class.java, OFFLINE_DATABASE
-    )
-        .fallbackToDestructiveMigration(false)
-        .build()
+    ).apply {
+        if (BuildConfig.DEBUG) {
+            fallbackToDestructiveMigration(dropAllTables = true)
+        }
+    }.build()
 
     @Provides
     @Singleton
     fun provideUserDao(db: OfflineDatabase) = db.userDao()
-
-    @Provides
-    fun provideUserEntity() = User()
+    
 
     @Provides
     @Singleton

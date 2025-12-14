@@ -36,24 +36,20 @@ class ReportsFragments : Fragment(R.layout.fragment_reports_fragments) {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentReportsFragmentsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     private fun FragmentReportsFragmentsBinding.bindReports(reports: Reports) = apply {
-        lTotalSalesSum.tvTotalSales.text =
-            reports.totalSales.toEuroFi()
+        lTotalSalesSum.tvTotalSales.text = reports.totalSales.toEuroFi()
 
         itemSalesLayout.tvCountSales.text = reports.countSales.toString()
 
-        lItemTodayReservations.tvTodaysReservation.text =
-            reports.todaysReservation.toString()
+        lItemTodayReservations.tvTodaysReservation.text = reports.todaysReservation.toString()
 
-        lItemPendingReservations.tvPendingReservations.text =
-            reports.pendingReservations.toString()
+        lItemPendingReservations.tvPendingReservations.text = reports.pendingReservations.toString()
 
         lItemTotalReservations.tvTotalReservations.text = reports.totalReservations.toString()
     }
@@ -70,17 +66,16 @@ class ReportsFragments : Fragment(R.layout.fragment_reports_fragments) {
                             binding.bindReports(reports)
 
                             binding.chartLayout.apply {
-                                tvChartTitle.text = "Orders & Reservations"
+                                tvLineChartTitle.text = "Orders Counts "
                                 setupLineChart(lineChart, reports.charts.orders)
+                                tvBarCharttTitle.text = "Reservation Counts "
                                 setupBarChart(barChart, reports.charts.reservations)
                             }
                         }
 
                         is UiState.Error -> {
                             Toast.makeText(
-                                requireContext(),
-                                state.message,
-                                Toast.LENGTH_SHORT
+                                requireContext(), state.message, Toast.LENGTH_SHORT
                             ).show()
                         }
                     }

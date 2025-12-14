@@ -63,7 +63,8 @@ class MainActivity : AppCompatActivity() {
         if (!hasAllPermissions(
                 listOf(
                     Manifest.permission.POST_NOTIFICATIONS,
-                    Manifest.permission.USE_FULL_SCREEN_INTENT
+                    Manifest.permission.USE_FULL_SCREEN_INTENT,
+                    Manifest.permission.FOREGROUND_SERVICE
                 )
             )
         ) {
@@ -106,7 +107,8 @@ class MainActivity : AppCompatActivity() {
             listOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.FOREGROUND_SERVICE
             )
         )
 

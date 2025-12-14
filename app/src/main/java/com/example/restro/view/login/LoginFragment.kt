@@ -1,6 +1,7 @@
 package com.example.restro.view.login
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.example.restro.R
 import com.example.restro.data.model.UserResponse
 import com.example.restro.databinding.LoginFragmentBinding
@@ -32,7 +34,9 @@ import kotlinx.coroutines.launch
 class LoginFragment : Fragment() {
     private var _binding: LoginFragmentBinding? = null
     private val binding get() = _binding!!
-    private val viewModel by viewModels<LoginViewModel>()
+    private val viewModel: LoginViewModel by navGraphViewModels(R.id.nav_graph){
+        defaultViewModelProviderFactory
+    }
 
     private val offlineViewModel by activityViewModels<UserViewModel>()
 
@@ -139,8 +143,15 @@ class LoginFragment : Fragment() {
                             offlineViewModel.setFirstLaunch(false)
                             // set user session
                             offlineViewModel.saveSession(userResponse.session)
+
                             // start service
-                            startService(userResponse.user._id)
+                            if (ContextCompat.checkSelfPermission(
+                                    requireContext(),
+                                    android.Manifest.permission.FOREGROUND_SERVICE
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                startService(userResponse.user._id)
+                            }
                             // navigate to dashboard
                             navigateToDashboard()
                         }
