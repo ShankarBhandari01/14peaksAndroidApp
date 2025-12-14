@@ -15,7 +15,9 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.inject.Singleton
 
+@Singleton
 object Charts {
     fun setupLineChart(lineChart: LineChart, orders: List<OrderReports>) {
         if (orders.isEmpty()) return
@@ -52,8 +54,9 @@ object Charts {
         lineChart.xAxis.isGranularityEnabled = true
         lineChart.xAxis.setDrawGridLines(true)
         lineChart.axisRight.isEnabled = true
-
+        lineChart.legend.isEnabled = true
         lineChart.description.isEnabled = true
+
         lineChart.invalidate() // refresh chart
     }
 
@@ -89,6 +92,7 @@ object Charts {
         barChart.xAxis.setDrawGridLines(true)
         barChart.axisRight.isEnabled = true
         barChart.description.isEnabled = true
+        barChart.legend.isEnabled = true
 
         barChart.invalidate() // refresh chart
     }

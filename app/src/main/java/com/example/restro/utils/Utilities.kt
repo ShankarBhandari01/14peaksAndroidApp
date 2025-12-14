@@ -367,7 +367,14 @@ object Utilities {
         paint.shader = shader
         invalidate()
     }
+    fun canUseFullScreen(context: Context): Boolean {
+        val nm = context.getSystemService(NotificationManager::class.java)
 
+        // If notifications are disabled, fullscreen will fail
+        if (!nm.areNotificationsEnabled()) return false
+
+        return true // Final decision is system-side
+    }
 
     fun Double.toEuroFi(): String {
         return NumberFormat

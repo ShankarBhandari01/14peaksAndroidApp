@@ -4,10 +4,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -15,12 +18,15 @@ import com.example.restro.R
 import com.example.restro.application.AppLifecycleTracker
 import com.example.restro.data.model.SocketNotification
 import com.example.restro.service.SocketIOService
+import com.example.restro.utils.Utilities.canUseFullScreen
 import com.example.restro.view.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.jar.Manifest
 import javax.inject.Inject
 import kotlin.jvm.java
+
 
 @AndroidEntryPoint
 class SocketForegroundService : LifecycleService() {
@@ -59,7 +65,7 @@ class SocketForegroundService : LifecycleService() {
 
     private fun startForegroundNotification() {
         val channelId = "socket_channel"
-        val nm = getSystemService(NotificationManager::class.java)
+        val nm = this.getSystemService(NotificationManager::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -68,12 +74,15 @@ class SocketForegroundService : LifecycleService() {
             nm.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Listening for updates")
-            .setSmallIcon(R.drawable.baseline_notifications_active_24)
-            .build()
+        val notification =
+            NotificationCompat
+                .Builder(this, channelId).setContentTitle("Listening for updates")
+                .setSmallIcon(R.drawable.baseline_notifications_active_24)
+                .build()
 
         startForeground(1, notification)
+
+
     }
 
     private fun handleIncomingNotification(notification: SocketNotification<Any>) {
@@ -81,16 +90,14 @@ class SocketForegroundService : LifecycleService() {
             // Send broadcast to activity
             val intent = Intent("SHOW_SOCKET_DIALOG")
             intent.putExtra("notification", notification)
+            intent.setClassName(this, "com.example.restro.view.MainActivity")
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         } else {
-            showSystemNotification(notification)
+            showSystemNotification(this, notification)
         }
     }
 
-
-    private fun showSystemNotification(notification: SocketNotification<Any>) {
-        val nm = getSystemService(NotificationManager::class.java)
-
+    private fun createHighPriorityChannel(context: Context): String {
         val channelId = "socket_channel"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create the channel with sound & high importance
@@ -108,29 +115,66 @@ class SocketForegroundService : LifecycleService() {
                     Notification.AUDIO_ATTRIBUTES_DEFAULT
                 )
             }
-            nm.createNotificationChannel(channel)
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
         }
+        return channelId
+    }
+
+    private fun showSystemNotification(
+        context: Context,
+        notification: SocketNotification<Any>
+    ) {
+        // notification manager
+        val nm = context.getSystemService(NotificationManager::class.java)
+        val requestCode = System.currentTimeMillis().toInt()
+
+        // create channel
+        val channelId = createHighPriorityChannel(this)
 
         //  fullScreenIntent for pop-up (heads-up)
-        val intent = Intent(this, MainActivity::class.java).apply {
+        val baseIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        // pending indent
+        val currentPendingIntent = PendingIntent.getActivity(
+            this,
+            requestCode,
+            baseIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        // full screen pending intent
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            this,
+            requestCode + 1,
+            baseIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val builder = NotificationCompat.Builder(this, channelId)
+        // notification builder
+        val builder = NotificationCompat
+            .Builder(this, channelId)
             .setContentTitle(notification.title ?: "New update")
             .setContentText(notification.body ?: "You have a new message")
             .setSmallIcon(R.drawable.logo)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setDefaults(Notification.DEFAULT_ALL) // vibration, lights, sound
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .setFullScreenIntent(pendingIntent, true) // heads-up pop-up
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setAutoCancel(true)
+            .setContentIntent(currentPendingIntent)
 
-        nm.notify(System.currentTimeMillis().toInt(), builder.build())
+        // android 14 compatibility
+        if (canUseFullScreen(this)) {
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+        } else {
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+        }
+        // notification
+        val notification = builder.build()
+
+        // notify to user
+        nm.notify(requestCode, notification)
     }
 
 
