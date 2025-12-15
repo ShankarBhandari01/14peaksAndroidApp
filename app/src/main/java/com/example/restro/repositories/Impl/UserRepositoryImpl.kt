@@ -88,6 +88,10 @@ class UserRepositoryImpl @Inject constructor(
             }
     }
 
-
+    override suspend fun clearSession() {
+        dataStore.edit { prefs ->
+            prefs.remove(SESSION)
+        }
+    }
 
 }

@@ -10,12 +10,22 @@ class ApiInterceptor @Inject constructor() : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
+        // Get clean tokens
+        val accessToken = session.token.trim()
+        val refreshToken = session.refreshToken.trim()
 
+        // Choose which token to send
+        val token = if (originalRequest.url.encodedPath.contains("token/refresh")) {
+            "Bearer $refreshToken"
+        } else {
+            "Bearer $accessToken"
+        }
+
+        // Build request
         val request = originalRequest.newBuilder()
-            .header("Authorization", "Bearer ${session.token}")
+            .header("Authorization", token)
             .build()
 
-        val response = chain.proceed(request)
-        return response
+        return chain.proceed(request)
     }
 }

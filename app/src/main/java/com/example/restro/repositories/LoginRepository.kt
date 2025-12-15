@@ -9,5 +9,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface LoginRepository {
     suspend fun login(login: LoginUser): Flow<UiState<ApiWrapper<UserResponse>>>
-    suspend fun refreshToken(): Flow<UiState<ApiWrapper<Session>>>
+    suspend fun refreshToken(refreshToken: String): Flow<UiState<ApiWrapper<Session>>>
 }

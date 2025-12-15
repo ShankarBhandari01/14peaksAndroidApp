@@ -90,7 +90,7 @@ class SocketForegroundService : LifecycleService() {
             // Send broadcast to activity
             val intent = Intent("SHOW_SOCKET_DIALOG")
             intent.putExtra("notification", notification)
-            intent.setClassName(this, "com.example.restro.view.MainActivity")
+            intent.setPackage("com.example.restro")
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
         } else {
             showSystemNotification(this, notification)
@@ -136,6 +136,9 @@ class SocketForegroundService : LifecycleService() {
         val baseIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+
+        baseIntent.setPackage("com.example.restro")
+
         // pending indent
         val currentPendingIntent = PendingIntent.getActivity(
             this,

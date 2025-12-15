@@ -10,15 +10,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
 import com.example.restro.databinding.DashboardFragmentBinding
 import com.example.restro.databinding.DrawerHeaderBinding
+import com.example.restro.utils.AuthEvent
+import com.example.restro.utils.AuthEventBus
 import com.example.restro.view.notification.NotificationActivity
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
@@ -61,6 +68,17 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
         binding.imgNotificationBtn.setOnClickListener {
             val intent = NotificationActivity.getIntent(requireContext())
             startActivity(intent)
+        }
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                AuthEventBus.events.collect { event ->
+                    if (event is AuthEvent.Logout) {
+                        Timber.d("logout")
+                    }
+                }
+            }
         }
     }
 

@@ -26,7 +26,7 @@ class LoginRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshToken(): Flow<UiState<ApiWrapper<Session>>> {
+    override suspend fun refreshToken(refreshToken: String): Flow<UiState<ApiWrapper<Session>>> {
         return baseResponse(networkHelper.isNetworkConnected()) {
             apiService.refreshToken()
         }

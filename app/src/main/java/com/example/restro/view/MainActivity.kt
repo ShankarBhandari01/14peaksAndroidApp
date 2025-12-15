@@ -16,6 +16,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -24,11 +27,14 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.SocketNotification
 import com.example.restro.databinding.ActivityMainBinding
+import com.example.restro.utils.AuthEvent
+import com.example.restro.utils.AuthEventBus
 import com.example.restro.utils.Utilities.showNotificationPopup
 import com.example.restro.view.notification.NotificationDetailsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -70,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         ) {
             requestAppPermissions()
         }
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
