@@ -9,7 +9,7 @@ import com.example.restro.di.intercepter.ApiInterceptorQualifier
 import com.example.restro.apis.Apis
 import com.example.restro.di.intercepter.PersistentCookieJar
 import com.example.restro.service.ApiService
-import com.example.restro.service.TokenAuthenticator
+import com.example.restro.di.intercepter.TokenAuthenticator
 import com.example.restro.service.impl.ApisServicesImpl
 import com.example.restro.utils.ConstantsValues.Companion.DEV_BASE_URL
 import com.example.restro.utils.ConstantsValues.Companion.LIVE_BASE_URL

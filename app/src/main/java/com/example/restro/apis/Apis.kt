@@ -21,6 +21,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -29,7 +30,7 @@ interface Apis {
     suspend fun login(@Body login: LoginUser): Response<ApiWrapper<UserResponse>>
 
     @POST(API_REFRESH_TOKEN)
-    suspend fun refreshToken(@Header("Authorization") refreshToken: String = ""): Response<ApiWrapper<Session>>
+    suspend fun refreshToken(): Response<ApiWrapper<Session>>
 
     @GET(API_GET_All_ORDERS)
     suspend fun getAllOrders(

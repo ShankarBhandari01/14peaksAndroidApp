@@ -14,4 +14,5 @@ interface UserRepository {
     suspend fun saveSession(session: Session)
     fun getSession(): Flow<Session>
 
+    suspend fun clearSession()
 }

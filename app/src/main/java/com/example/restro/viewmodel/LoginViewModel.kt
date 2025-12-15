@@ -72,6 +72,7 @@ class LoginViewModel @Inject constructor(
         }
         return true
     }
+
     private fun prepareLogin(): LoginUser {
         return LoginUser(
             email = email.value.toString(),
@@ -92,9 +93,9 @@ class LoginViewModel @Inject constructor(
                         is UiState.Success -> {
                             if (state.data.type == "success") {
                                 // Save session data
-                                session.token = state.data.data.session.token
+                                session.token = state.data.data.session.token.trim()
                                 session.refreshToken =
-                                    state.data.data.session.refreshToken
+                                    state.data.data.session.refreshToken.trim()
                                 _LoginuiState.value = UiState.Success(state.data.data)
 
                             } else {
@@ -102,6 +103,7 @@ class LoginViewModel @Inject constructor(
                                     UiState.Error(state.data.message)
                             }
                         }
+
                         is UiState.Error -> _LoginuiState.value =
                             UiState.Error(state.message ?: "Login failed")
 
