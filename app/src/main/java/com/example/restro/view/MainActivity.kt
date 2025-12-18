@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity() {
             requestAppPermissions()
         }
 
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

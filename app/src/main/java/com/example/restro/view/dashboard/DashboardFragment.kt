@@ -13,7 +13,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.restro.R
 import com.example.restro.data.model.User
@@ -75,7 +77,13 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 AuthEventBus.events.collect { event ->
                     if (event is AuthEvent.Logout) {
-                        Timber.d("logout")
+                        findNavController().navigate(
+                            R.id.loginFragment,
+                            null,
+                            NavOptions.Builder()
+                                .setPopUpTo(R.id.nav_graph, inclusive = true)
+                                .build()
+                        )
                     }
                 }
             }
