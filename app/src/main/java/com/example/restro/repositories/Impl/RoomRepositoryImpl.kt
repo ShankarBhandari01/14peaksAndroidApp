@@ -53,7 +53,7 @@ class RoomRepositoryImpl @Inject constructor(
         limit: Int, filterDays: Long, type: String
     ): Flow<PagingData<Reservation>> {
 
-      //  val cutoff = cutoffDate(filterDays)
+        //  val cutoff = cutoffDate(filterDays)
 
         return Pager(
             config = PagingConfig(
@@ -113,5 +113,9 @@ class RoomRepositoryImpl @Inject constructor(
 
     override suspend fun getLocalData(): Flow<List<SalesWithDetails>> {
         return db.saleReservationDao().getSalesWithDetails()
+    }
+
+    override suspend fun insertReservation(newReservation: Reservation) {
+        return db.saleReservationDao().upsertReservation(newReservation)
     }
 }

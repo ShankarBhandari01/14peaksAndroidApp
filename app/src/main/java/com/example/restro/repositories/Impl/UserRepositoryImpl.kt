@@ -21,10 +21,10 @@ import javax.inject.Singleton
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
-    private val userDao: UserDao
+    private val dataStore: DataStore<Preferences>, private val userDao: UserDao
 ) : UserRepository, BaseRepository() {
     private val FIRST_LAUNCH = booleanPreferencesKey("first_launch")
+    private val LOGOUT = booleanPreferencesKey("logout")
     private val USER_ID = stringPreferencesKey("user_id")
     private val SESSION = stringPreferencesKey("session")
 
@@ -39,6 +39,25 @@ class UserRepositoryImpl @Inject constructor(
         }.map {
             val firstLaunch = it[FIRST_LAUNCH] ?: true
             firstLaunch
+        }
+    }
+
+    override suspend fun logout(logout: Boolean) {
+        dataStore.edit {
+            it[LOGOUT] = logout
+        }
+    }
+
+    override fun isLogout(): Flow<Boolean> {
+        return dataStore.data.catch { e ->
+            if (e is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw e
+            }
+        }.map {
+            val isLogout = it[LOGOUT] ?: false
+            isLogout
         }
     }
 
@@ -82,8 +101,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getSession(): Flow<Session> {
-        return dataStore.data
-            .map { prefs ->
+        return dataStore.data.map { prefs ->
                 prefs[SESSION]?.let { Gson().fromJson(it, Session::class.java) } ?: Session()
             }
     }

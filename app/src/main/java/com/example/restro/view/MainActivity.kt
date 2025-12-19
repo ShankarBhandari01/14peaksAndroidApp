@@ -29,6 +29,7 @@ import com.example.restro.data.model.SocketNotification
 import com.example.restro.databinding.ActivityMainBinding
 import com.example.restro.utils.AuthEvent
 import com.example.restro.utils.AuthEventBus
+import com.example.restro.utils.Utilities.showExitConfirmationDialog
 import com.example.restro.utils.Utilities.showNotificationPopup
 import com.example.restro.view.notification.NotificationDetailsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -174,14 +175,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun showExitConfirmationDialog() {
-        MaterialAlertDialogBuilder(this).setTitle("Exit App")
-            .setMessage("Are you sure you want to exit?").setPositiveButton("Exit") { dialog, _ ->
-                dialog.dismiss()
-                finishAffinity()
-            }.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }.show()
-    }
 
     private val socketDialogReceiver = object : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)

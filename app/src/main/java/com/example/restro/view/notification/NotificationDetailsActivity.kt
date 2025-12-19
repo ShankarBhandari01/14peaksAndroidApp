@@ -1,9 +1,11 @@
 package com.example.restro.view.notification
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +27,7 @@ class NotificationDetailsActivity : AppCompatActivity() {
         ActivityNotificationDetailsBinding.inflate(layoutInflater)
     }
     val gson = Gson()
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -23,6 +24,7 @@ import com.example.restro.databinding.DashboardFragmentBinding
 import com.example.restro.databinding.DrawerHeaderBinding
 import com.example.restro.utils.AuthEvent
 import com.example.restro.utils.AuthEventBus
+import com.example.restro.utils.Utilities.showExitConfirmationDialog
 import com.example.restro.view.notification.NotificationActivity
 import com.example.restro.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,22 +74,41 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
             startActivity(intent)
         }
 
+        headerBinding.logoutContainer.setOnClickListener {
+            requireActivity().showExitConfirmationDialog(
+                title = "Logout",
+                message = "Are you sure you want to logout?",
+                onExit = { logout() }
+            )
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 AuthEventBus.events.collect { event ->
                     if (event is AuthEvent.Logout) {
-                        findNavController().navigate(
-                            R.id.loginFragment,
-                            null,
-                            NavOptions.Builder()
-                                .setPopUpTo(R.id.nav_graph, inclusive = true)
-                                .build()
-                        )
+                        Toast.makeText(requireActivity(), "Token Expired!!", Toast.LENGTH_LONG)
+                            .show()
+
+                        logout()
+
                     }
                 }
             }
         }
+    }
+
+
+    private fun logout() {
+
+        offlineDatabaseViewModel.setLogout(true)
+
+        findNavController().navigate(
+            R.id.loginFragment,
+            null,
+            NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, inclusive = true)
+                .build()
+        )
     }
 
     private fun setSideNavigation() {
@@ -128,14 +149,23 @@ class DashboardFragment : Fragment(R.layout.dashboard_fragment) {
 
         // NavigationView item clicks
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.reportFragment -> navController.navigate(R.id.reportFragment)
-                R.id.reservationFragment -> navController.navigate(R.id.reservationFragment)
-                R.id.salesOrderFragment -> navController.navigate(R.id.salesOrderFragment)
-                R.id.menuItemsFragment -> navController.navigate(R.id.menuItemsFragment)
-            }
+            val options = NavOptions.Builder()
+                .setLaunchSingleTop(true)   // Avoid re-creating same fragment
+                .setRestoreState(true)      // Restore previous state
+                .setPopUpTo(
+                    navController.graph.startDestinationId,
+                    inclusive = false,
+                    saveState = true
+                )
+                .build()
+            navController.navigate(menuItem.itemId, null, options)
+
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
+        }
+        // set menu times checked
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.navigationView.setCheckedItem(destination.id)
         }
     }
 

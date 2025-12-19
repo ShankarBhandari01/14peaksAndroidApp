@@ -24,6 +24,8 @@
         android:tooltipText="View sales orders"
         app:showAsAction="ifRoom|withText" />
 
+
+    <!-- Items Menu -->
     <item
         android:id="@+id/menuItemsFragment"
         android:icon="@drawable/menufood"
@@ -31,12 +33,12 @@
         android:tooltipText="Manage menu items"
         app:showAsAction="ifRoom|withText" />
 
-    <!-- Account -->
+    <!--Company-->
     <item
-        android:id="@+id/accountFragment"
-        android:icon="@drawable/account"
-        android:title="My Account"
-        android:tooltipText="Manage account settings"
+        android:id="@+id/companyInfoFragment"
+        android:icon="@drawable/company_ic"
+        android:title="Company"
+        android:tooltipText="Company Infomation"
         app:showAsAction="ifRoom|withText" />
 
 </menu>

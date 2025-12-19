@@ -13,27 +13,38 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DiffUtil
 import com.example.restro.R
 import com.example.restro.data.model.Reservation
+import com.example.restro.data.model.ReservationStatus
+import com.example.restro.data.model.ReservationStatusRequest
 import com.example.restro.databinding.FragmentOldReservationFragmentsBinding
 import com.example.restro.databinding.ReservationItemBinding
 import com.example.restro.databinding.ReservationItemBinding.inflate
+import com.example.restro.utils.UiState
+import com.example.restro.utils.Utilities
 import com.example.restro.utils.Utilities.applyGradient
+import com.example.restro.utils.Utilities.showConfirmationDialog
 import com.example.restro.utils.setFormattedDate
 import com.example.restro.view.adapters.BasePagingAdapter
 import com.example.restro.view.adapters.LoadingStateAdapter
 import com.example.restro.view.adapters.ReservationTabAdapter
 import com.example.restro.view.adapters.ShimmerAdapter
+import com.example.restro.viewmodel.ReservationViewmodel
 import com.example.restro.viewmodel.SalesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
+import retrofit2.HttpException
+import timber.log.Timber
+import java.io.IOException
 import kotlin.getValue
 import kotlin.text.ifEmpty
 
@@ -44,7 +55,7 @@ class OldReservationFragments() :
     private val binding get() = _binding!!
 
     lateinit var reservationJob: Job
-    private val viewModel by viewModels<SalesViewModel>(
+    private val viewModel by viewModels<ReservationViewmodel>(
         ownerProducer = { requireParentFragment() }
     )
 
@@ -76,9 +87,46 @@ class OldReservationFragments() :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.setReservationType(type)
+        observersViewModel()
         setUpRecyclerViewPagingData()
+
     }
 
+    private fun observersViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.reservationStatus.collect { state ->
+                    when (state) {
+                        is UiState.Loading -> {
+                            Utilities.showProgressDialog(
+                                "Updating Reservation, please wait!!",
+                                requireActivity()
+                            )
+                        }
+
+                        is UiState.Error -> {
+                            Utilities.dismissProgressDialog()
+                            Toast.makeText(
+                                requireActivity(),
+                                state.message,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        is UiState.Success -> {
+                            Utilities.dismissProgressDialog()
+
+                            Toast.makeText(
+                                requireActivity(),
+                                "Reservation update successfully ",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun setUpRecyclerViewPagingData() {
         val reservationAdapter = BasePagingAdapter(
@@ -146,17 +194,45 @@ class OldReservationFragments() :
                             R.color.md_theme_error
                         )
 
-                        else -> ContextCompat.getColor(root.context, R.color.md_theme_onPrimaryContainer)
+                        else -> ContextCompat.getColor(
+                            root.context,
+                            R.color.md_theme_onPrimaryContainer
+                        )
                     }
                     (tvStatus.background as GradientDrawable).setColor(statusColor)
                     tvStatus.text = reservation.status
 
+                    llChangeStatus.btnAccept.setOnClickListener {
+                        val status =
+                            ReservationStatusRequest(status = ReservationStatus.CONFIRMED.value)
 
-                    llChangeStatus.btnAccept.setOnClickListener {
-                        Toast.makeText(context, "accepted", Toast.LENGTH_SHORT).show()
+                        requireActivity().showConfirmationDialog(
+                            title = "Confirmation Dialog",
+                            message = "Do you want to accept this reservation?",
+                            onPositive = {
+                                viewModel.updateStateReservation(
+                                    reservation._id,
+                                    status
+                                )
+                            },
+                            onNegative = {}
+                        )
                     }
-                    llChangeStatus.btnAccept.setOnClickListener {
-                        Toast.makeText(context, "rejected", Toast.LENGTH_SHORT).show()
+                    llChangeStatus.btnReject.setOnClickListener {
+                        val status =
+                            ReservationStatusRequest(status = ReservationStatus.CANCELLED.value)
+
+                        requireActivity().showConfirmationDialog(
+                            title = "Confirmation Dialog",
+                            message = "Do you want to reject this reservation?",
+                            onPositive = {
+                                viewModel.updateStateReservation(
+                                    reservation._id,
+                                    status
+                                )
+                            },
+                            onNegative = {}
+                        )
                     }
                 }
             },
@@ -187,8 +263,23 @@ class OldReservationFragments() :
                 is LoadState.NotLoading -> binding.reservationRecyclerView.adapter =
                     reservationAdapter.withLoadStateFooter(LoadingStateAdapter { reservationAdapter.retry() })
 
-                is LoadState.Error -> Toast.makeText(context, "Failed to load", Toast.LENGTH_SHORT)
-                    .show()
+                is LoadState.Error -> {
+                    val error = (loadState.refresh as LoadState.Error).error
+
+                    val errorMessage = when (error) {
+                        is IOException -> "No internet connection"
+                        is HttpException -> {
+                            "Server error ${error.code()}"
+                        }
+
+                        else -> {
+                            Timber.tag("error").d(error)
+                            error.localizedMessage ?: "Unknown error"
+                        }
+                    }
+
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                }
             }
         }
 

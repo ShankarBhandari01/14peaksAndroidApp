@@ -9,7 +9,11 @@ import com.example.restro.data.model.User
 import com.example.restro.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +30,16 @@ class UserViewModel @Inject constructor(
     val userId: LiveData<String> = userRepository.getUserId().asLiveData()
 
     var isFirstLaunch = userRepository.getFirstLaunch()
+
+    val _isLogout = MutableStateFlow(false)
+    val isLogout: StateFlow<Boolean> get() = _isLogout
+
+    fun setLogout(logout: Boolean) {
+        viewModelScope.launch {
+            _isLogout.value = logout
+            userRepository.logout(logout)
+        }
+    }
 
     fun setFirstLaunch(isFirstLaunch: Boolean) =
         viewModelScope.launch {

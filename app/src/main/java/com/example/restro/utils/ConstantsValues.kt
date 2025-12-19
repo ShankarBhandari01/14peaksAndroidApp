@@ -69,6 +69,8 @@ class ConstantsValues {
         const val API_NOTIFICATION = "notification"
         const val API_GET_ALL_RESERVATION = "getAllReservations"
         const val API_ANALYSE_REPORTS = "analyse_reports"
+        const val API_COMPANY_INFO = "getCompanyInfo"
+        const val API_UPDATE_RESERVATION_STATUS = "updateReservationStatus/{reservationId}"
 
 
         // Structured scope for background work

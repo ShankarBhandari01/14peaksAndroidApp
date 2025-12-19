@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun getFirstLaunch(): Flow<Boolean>
+    suspend fun logout(logout: Boolean)
+    fun isLogout(): Flow<Boolean>
     suspend fun saveFirstLaunch(isFirstLaunch: Boolean)
     suspend fun saveUserId(userId: String)
     fun getUserId(): Flow<String>

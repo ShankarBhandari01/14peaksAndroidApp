@@ -6,13 +6,17 @@ import com.example.restro.service.ApiService
 import com.example.restro.di.intercepter.NetworkHelper
 import com.example.restro.local.OfflineDatabase
 import com.example.restro.local.UserDao
+import com.example.restro.repositories.CompanyRepository
+import com.example.restro.repositories.Impl.CompanyRepositoryImpl
 import com.example.restro.repositories.Impl.LoginRepositoryImpl
 import com.example.restro.repositories.Impl.ReportsRepositoryImpl
+import com.example.restro.repositories.Impl.ReservationRepositoryImpl
 import com.example.restro.repositories.Impl.RoomRepositoryImpl
 import com.example.restro.service.impl.SocketIOServiceImpl
 import com.example.restro.repositories.Impl.UserRepositoryImpl
 import com.example.restro.repositories.LoginRepository
 import com.example.restro.repositories.ReportsRepository
+import com.example.restro.repositories.ReservationRepository
 import com.example.restro.repositories.RoomRepository
 import com.example.restro.service.SocketIOService
 import com.example.restro.repositories.UserRepository
@@ -73,5 +77,21 @@ object RepositoryModule {
         return SocketIOServiceImpl(apiService, networkHelper, salesRepository)
     }
 
+    @Provides
+    @Singleton
+    fun providesCompanyRepository(
+        apiService: ApiService,
+        networkHelper: NetworkHelper,
+    ): CompanyRepository {
+        return CompanyRepositoryImpl(apiService, networkHelper)
+    }
 
+    @Provides
+    @Singleton
+    fun providesReservationRepository(
+        apiService: ApiService,
+        networkHelper: NetworkHelper,
+    ): ReservationRepository {
+        return ReservationRepositoryImpl(apiService, networkHelper)
+    }
 }

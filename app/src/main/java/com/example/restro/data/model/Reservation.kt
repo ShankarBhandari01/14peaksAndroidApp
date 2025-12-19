@@ -27,4 +27,5 @@ data class Reservation(
     val status: String,
     val table_id: String,
     val updated_ts: String,
-): Serializable
+    val uuid: String?=""
+) : Serializable

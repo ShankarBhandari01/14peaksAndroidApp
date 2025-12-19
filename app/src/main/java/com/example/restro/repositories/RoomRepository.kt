@@ -24,4 +24,6 @@ interface RoomRepository {
 
     suspend fun getLocalData(): Flow<List<SalesWithDetails>>
 
+    suspend fun insertReservation(newReservation: Reservation)
+
 }
