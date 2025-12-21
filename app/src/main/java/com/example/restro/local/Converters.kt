@@ -6,6 +6,7 @@ import com.example.restro.data.model.ItemsData
 import com.example.restro.data.model.MenuRight
 import com.example.restro.data.model.Name
 import com.example.restro.data.model.OrderItems
+import com.example.restro.data.model.ReservationStatus
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -67,5 +68,6 @@ class Converters {
     fun menuRightsToString(list: List<MenuRight>?): String? {
         return gson.toJson(list)
     }
+
 }
 

@@ -13,25 +13,23 @@ import com.example.restro.utils.ConstantsValues.Companion.session
 import com.example.restro.utils.UiState
 import com.example.restro.utils.Utilities
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: LoginRepository,
-    application: Application
+    private val repository: LoginRepository, application: Application
 ) : BaseViewmodel(application) {
 
     val email = MutableLiveData<String>("shankar123@gmail.com")
     val password = MutableLiveData<String>("Shankar@12345")
 
 
-    val _LoginuiState = MutableStateFlow<UiState<Any>>(UiState.Loading)
-    val LoginuiState: StateFlow<UiState<Any>> = _LoginuiState.asStateFlow()
+    private val _LoginuiState = MutableSharedFlow<UiState<Any>>(0)
+    val LoginuiState: SharedFlow<UiState<Any>> = _LoginuiState
 
     private val _emailError = MutableLiveData<String?>()
     val emailError: LiveData<String?> = _emailError
@@ -43,8 +41,7 @@ class LoginViewModel @Inject constructor(
     val isLoginEnabled: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
         val update = {
             value =
-                _emailError.value == null && _passwordError.value == null && !email.value.isNullOrEmpty() &&
-                        !password.value.isNullOrEmpty()
+                _emailError.value == null && _passwordError.value == null && !email.value.isNullOrEmpty() && !password.value.isNullOrEmpty()
         }
 
         addSource(email) { update() }
@@ -82,39 +79,42 @@ class LoginViewModel @Inject constructor(
         )
     }
 
+
     fun login() {
         if (!validateData()) return
 
         viewModelScope.launch {
             try {
-
+                // first state is loading
+                _LoginuiState.emit(UiState.Loading)
                 repository.login(prepareLogin()).collect { state ->
                     when (state) {
                         is UiState.Success -> {
                             if (state.data.type == "success") {
                                 // Save session data
                                 session.token = state.data.data.session.token.trim()
-                                session.refreshToken =
-                                    state.data.data.session.refreshToken.trim()
-                                _LoginuiState.value = UiState.Success(state.data.data)
+                                session.refreshToken = state.data.data.session.refreshToken.trim()
+                                _LoginuiState.emit(UiState.Success(state.data.data))
 
                             } else {
-                                _LoginuiState.value =
+                                _LoginuiState.emit(
                                     UiState.Error(state.data.message)
+                                )
                             }
                         }
 
-                        is UiState.Error -> _LoginuiState.value =
+                        is UiState.Error -> _LoginuiState.emit(
                             UiState.Error(state.message ?: "Login failed")
+                        )
 
                         is UiState.Loading -> {
-                            _LoginuiState.value = UiState.Loading
+                            _LoginuiState.emit(UiState.Loading)
                         }
                     }
 
                 }
             } catch (e: Exception) {
-                _LoginuiState.value = UiState.Error("Login failed: ${e.localizedMessage}")
+                _LoginuiState.emit(UiState.Error("Login failed: ${e.localizedMessage}"))
             }
         }
     }

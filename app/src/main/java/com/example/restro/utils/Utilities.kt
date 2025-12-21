@@ -41,9 +41,13 @@ import com.example.restro.data.model.Reservation
 import com.example.restro.databinding.DialogNotificationPopupBinding
 import com.example.restro.databinding.DialogProgressBinding
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
@@ -92,6 +96,7 @@ object Utilities {
         return try {
             // Try Google Advertising ID first
             val adInfo = withContext(Dispatchers.IO) {
+
                 AdvertisingIdClient.getAdvertisingIdInfo(context)
             }
             val adId = adInfo.id
@@ -367,6 +372,7 @@ object Utilities {
         paint.shader = shader
         invalidate()
     }
+
     fun canUseFullScreen(context: Context): Boolean {
         val nm = context.getSystemService(NotificationManager::class.java)
 
@@ -380,5 +386,47 @@ object Utilities {
         return NumberFormat
             .getCurrencyInstance(Locale("fi", "FI"))
             .format(this)
+    }
+
+
+    // Extension function for Activity
+    fun Activity.showExitConfirmationDialog(
+        title: String = "Exit App",
+        message: String = "Are you sure you want to exit?",
+        onExit: (() -> Unit)? = null
+    ) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("Exit") { dialog, _ ->
+                dialog.dismiss()
+                onExit?.invoke() ?: finishAffinity()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    fun Activity.showConfirmationDialog(
+        title: String = "Confirm Action",
+        message: String = "Are you sure?",
+        positiveText: String = "Yes",
+        negativeText: String = "No",
+        onPositive: (() -> Unit)? = null,
+        onNegative: (() -> Unit)? = null
+    ) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(positiveText) { dialog, _ ->
+                dialog.dismiss()
+                onPositive?.invoke()
+            }
+            .setNegativeButton(negativeText) { dialog, _ ->
+                dialog.dismiss()
+                onNegative?.invoke()
+            }
+            .show()
     }
 }

@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 class LoginFragment : Fragment() {
     private var _binding: LoginFragmentBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: LoginViewModel by navGraphViewModels(R.id.nav_graph){
+    private val viewModel: LoginViewModel by navGraphViewModels(R.id.nav_graph) {
         defaultViewModelProviderFactory
     }
 
@@ -66,12 +66,16 @@ class LoginFragment : Fragment() {
         disableLoginButton()
         observeViewModel()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         automaticLogin()
     }
 
     private fun automaticLogin() {
         lifecycleScope.launch {
-            if (!offlineViewModel.isFirstLaunch.first()) {
+            if (!offlineViewModel.isFirstLaunch.first() && !offlineViewModel.isLogout.value) {
                 binding.loginButton.performClick()
             }
         }
@@ -123,7 +127,7 @@ class LoginFragment : Fragment() {
                     Utilities.dismissProgressDialog()
                     when (state) {
                         is UiState.Loading -> Utilities.showProgressDialog(
-                            "Logging in…", activity as MainActivity
+                            "Logging in…", requireActivity()
                         )
 
                         is UiState.Error -> {

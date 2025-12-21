@@ -18,7 +18,7 @@ class ReportsViewmodel @Inject constructor(
     private val repository: ReportsRepository, application: Application
 ) : BaseViewmodel(application) {
 
-    val _reportsUiState = MutableStateFlow<UiState<Any>>(UiState.Loading)
+    private val _reportsUiState = MutableStateFlow<UiState<Any>>(UiState.Loading)
     val reportsUiState: StateFlow<UiState<Any>> = _reportsUiState.asStateFlow()
 
     fun generateReports(days: Int = 30) {

@@ -14,7 +14,7 @@ import com.example.restro.data.model.User
 @TypeConverters(Converters::class)
 @Database(
     entities = [User::class, Customer::class, ItemsData::class, OrderItems::class, Sales::class, Reservation::class, PaginationState::class],
-    version = 5,
+    version = 7,
     exportSchema = false
 )
 abstract class OfflineDatabase : RoomDatabase() {

@@ -25,6 +25,13 @@ data class ApiResponse<T>(
     val countByStatus: List<CountByStatus>
 ) : Serializable
 
+data class ResponseV2<T>(
+    val rsType: String,
+    val message: String,
+    val statusCode: String,
+    val data: T,
+) : Serializable
+
 data class Pagination(
     val currentPage: Int,
     val totalPages: Int,
